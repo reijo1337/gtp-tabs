@@ -1,0 +1,17 @@
+syntax = "proto3"
+
+package protocol
+
+message SearchString {
+    string search = 1;
+    bool char = 2;
+}
+
+message MusicianWithCount {
+    string Name = 1;
+    int32 count = 2;
+}
+
+service Books {
+    rpc GetAuthorByLetter(SearchString) returns (MusicianWithCount) {}
+}
