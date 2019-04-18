@@ -1,17 +1,24 @@
-syntax = "proto3"
+syntax = "proto3";
 
-package protocol
+package protocol;
 
 message SearchString {
-    string search = 1;
-    bool char = 2;
+    string Search = 1;
 }
 
 message MusicianWithCount {
     string Name = 1;
-    int32 count = 2;
+    int32 Count = 2;
 }
 
-service Books {
-    rpc GetAuthorByLetter(SearchString) returns (MusicianWithCount) {}
+message TabWithSize {
+    string Musician = 1;
+    string Name = 2;
+    double Size = 3;
+}
+
+service Tabs {
+    rpc GetAuthorsByLetter(SearchString) returns (stream MusicianWithCount) {}
+    rpc GetAuthorsByName(SearchString) returns (stream MusicianWithCount) {}
+    rpc FindTabsByName(SearchString) returns (stream TabWithSize) {}
 }
