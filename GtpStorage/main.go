@@ -15,7 +15,12 @@ func main() {
 		log.Printf("Main: Can't start server on port %s: %s", ServerPort, err)
 	}
 
-	serv, err := MakeServer()
+	db, err := SetUpDatabase()
+	if err != nil {
+		log.Println("Main: Can't  setup database", err)
+	}
+
+	serv, err := MakeServer(db)
 	if err != nil {
 		log.Println("Main: Can't  start server", err)
 	}

@@ -11,12 +11,8 @@ type Server struct {
 }
 
 // MakeServer возвращает новый объект Server, который представляет определения для grpc
-func MakeServer() (*Server, error) {
+func MakeServer(db *Database) (*Server, error) {
 	log.Println("Server: Set up book service...")
-	db, err := SetUpDatabase()
-	if err != nil {
-		return nil, err
-	}
 	return &Server{db: db}, nil
 }
 
