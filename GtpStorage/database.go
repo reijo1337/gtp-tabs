@@ -73,14 +73,18 @@ func createSchema(db *sql.DB) error {
 	return nil
 }
 
-func (db *Database) getMusicians(searchString string) ([]*MusiciansWithCount, error) {
+func (db *Database) getMusiciansByLetter(searchString string) ([]*MusiciansWithCount, error) {
 	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
-	result := make([]*MusiciansWithCount, 0)
 	lowerSearchString := strings.ToLower(searchString)
-	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(title) LIKE '%$1%')", lowerSearchString)
+	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(title) LIKE '$1%')", lowerSearchString)
 	if err != nil {
 		return nil, err
 	}
+	return db.getMusiciansWithCount(rows)
+}
+
+func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]*MusiciansWithCount, error) {
+	result := make([]*MusiciansWithCount, 0)
 	for rows.Next() {
 		var resMusician *MusiciansWithCount
 		rows.Scan(&(resMusician.ID), &(resMusician.Name))
@@ -96,4 +100,14 @@ func (db *Database) getMusicians(searchString string) ([]*MusiciansWithCount, er
 		musician.Count = count
 	}
 	return result, nil
+}
+
+func (db *Database) getMusicians(searchString string) ([]*MusiciansWithCount, error) {
+	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
+	lowerSearchString := strings.ToLower(searchString)
+	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(title) LIKE '%$1%')", lowerSearchString)
+	if err != nil {
+		return nil, err
+	}
+	return db.getMusiciansWithCount(rows)
 }

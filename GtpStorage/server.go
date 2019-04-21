@@ -18,11 +18,47 @@ func MakeServer(db *Database) (*Server, error) {
 
 // GetAuthorsByLetter возвращает список музыкантов и количество их исполнителей через поиск по первой букве
 func (s *Server) GetAuthorsByLetter(in *protocol.SearchString, p protocol.Tabs_GetAuthorsByLetterServer) error {
+	log.Println("New request for searching musicians by letter", in.GetSearch())
+	result, err := s.db.getMusiciansByLetter(in.GetSearch())
+	if err != nil {
+		log.Println("Can't get musicians by letter", in.GetSearch(), "from database.", err)
+		return err
+	}
+
+	for _, res := range result {
+		mwc := &protocol.MusicianWithCount{
+			Name:  res.Name,
+			Count: res.Count,
+		}
+		if err := p.Send(mwc); err == nil {
+			log.Println("Can't send info about musician", res.Name)
+			return err
+		}
+	}
+	log.Println("Request for searcing musicians by letter", in.GetSearch(), "processes succsesfuly")
 	return nil
 }
 
 // GetAuthorsByName возвращает список музыкантов и количество их исполнителей через поиск по подстроке
 func (s *Server) GetAuthorsByName(in *protocol.SearchString, p protocol.Tabs_GetAuthorsByNameServer) error {
+	log.Println("New request for searching musicians by substing", in.GetSearch())
+	result, err := s.db.getMusicians(in.GetSearch())
+	if err != nil {
+		log.Println("Can't get musicians by substring", in.GetSearch(), "from database.", err)
+		return err
+	}
+
+	for _, res := range result {
+		mwc := &protocol.MusicianWithCount{
+			Name:  res.Name,
+			Count: res.Count,
+		}
+		if err := p.Send(mwc); err == nil {
+			log.Println("Can't send info about musician", res.Name, err)
+			return err
+		}
+	}
+	log.Println("Request for searcing musicians by letter", in.GetSearch(), "processes succsesfuly")
 	return nil
 }
 
