@@ -111,3 +111,23 @@ func (db *Database) getMusicians(searchString string) ([]*MusiciansWithCount, er
 	}
 	return db.getMusiciansWithCount(rows)
 }
+
+func (db *Database) getTabsByName(searchString string) ([]*TabWithSize, error) {
+	log.Printf("DB: Getting tabs with size by search request: %s\n", searchString)
+	ret := make([]*TabWithSize, 0)
+	lowerSearchString := strings.ToLower(searchString)
+	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%$1%')", lowerSearchString)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var tabInfo *TabWithSize
+		var musicianID int32
+		rows.Scan(&musicianID, &(tabInfo.Name), &(tabInfo.Size))
+		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", musicianID).Scan(&(tabInfo.Musician)); err != nil {
+			return nil, err
+		}
+		ret = append(ret, tabInfo)
+	}
+	return ret, nil
+}

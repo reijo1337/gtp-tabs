@@ -64,5 +64,7 @@ func (s *Server) GetAuthorsByName(in *protocol.SearchString, p protocol.Tabs_Get
 
 // FindTabsByName возвращает список табулатур и количество их исполнителей через поиск по подстроке
 func (s *Server) FindTabsByName(in *protocol.SearchString, p protocol.Tabs_FindTabsByNameServer) error {
+	log.Println("New request for searching tabs by substring", in.GetSearch())
+
 	return nil
 }
