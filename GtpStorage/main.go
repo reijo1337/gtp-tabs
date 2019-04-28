@@ -1,12 +1,8 @@
 package main
 
 import (
-	"gtp-tabs/GtpStorage/protocol"
 	"log"
-	"net"
 	"os"
-
-	"google.golang.org/grpc"
 )
 
 // Инициализирует глобальные переменные на основе системных
@@ -21,7 +17,7 @@ func init() {
 	}
 	DatabaseName = os.Getenv("DB_NAME")
 	if DatabaseName == "" {
-		DatabaseName = "postgres"
+		DatabaseName = "storage"
 	}
 	ServerPort = os.Getenv("SERVER_PORT")
 	if ServerPort == "" {
@@ -35,24 +31,10 @@ func init() {
 
 func main() {
 	log.SetFlags(log.LstdFlags)
-	lis, err := net.Listen("tcp", ":"+ServerPort)
+	r, err := SetUpRouter()
 	if err != nil {
-		log.Printf("Main: Can't start server on port %s: %s", ServerPort, err)
+		log.Panicln("Can't set up server:", err)
 	}
-
-	db, err := SetUpDatabase()
-	if err != nil {
-		log.Println("Main: Can't  setup database", err)
-	}
-
-	serv, err := MakeServer(db)
-	if err != nil {
-		log.Println("Main: Can't  start server", err)
-	}
-
-	server := grpc.NewServer()
-
-	protocol.RegisterTabsServer(server, serv)
-	log.Println("Main: Starting server at port", ServerPort)
-	server.Serve(lis)
+	log.Println("Starting server on port ", ServerPort)
+	r.Run(":" + ServerPort)
 }

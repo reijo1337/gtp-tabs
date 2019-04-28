@@ -62,10 +62,10 @@ func createSchema(db *sql.DB) error {
 	if _, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS tabs (
 			id SERIAL NOT NULL PRIMARY KEY,
-			author INT NOT NULL REFERENCES writers (id),
+			author INT NOT NULL REFERENCES musicians (id),
 			name VARCHAR(50) NOT NULL UNIQUE,
 			category INT NOT NULL REFERENCES categories (id),
-			size DOUBLE DEFAULT 0
+			size REAL DEFAULT 0
 		)
 	`); err != nil {
 		return err
@@ -77,7 +77,7 @@ func createSchema(db *sql.DB) error {
 func (db *Database) getMusiciansByLetter(searchString string) ([]*MusiciansWithCount, error) {
 	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
 	lowerSearchString := strings.ToLower(searchString)
-	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(title) LIKE '$1%')", lowerSearchString)
+	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '" + lowerSearchString + "%')")
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]*MusiciansWithCount
 
 	var count int32
 	for _, musician := range result {
-		err := db.QueryRow("SELECT count(*) FROM books where author = $1", musician.ID).Scan(&count)
+		err := db.QueryRow("SELECT count(*) FROM books WHERE author = $1", musician.ID).Scan(&count)
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +106,7 @@ func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]*MusiciansWithCount
 func (db *Database) getMusicians(searchString string) ([]*MusiciansWithCount, error) {
 	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
 	lowerSearchString := strings.ToLower(searchString)
-	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(title) LIKE '%$1%')", lowerSearchString)
+	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '%" + lowerSearchString + "%')")
 	if err != nil {
 		return nil, err
 	}
