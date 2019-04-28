@@ -29,6 +29,8 @@ func SetUpRouter() (*gin.Engine, error) {
 	}
 	r.GET("/authors_by_letter", s.GetAuthorsByLetter)
 	r.GET("/author_by_name", s.GetAuthorsByName)
+	r.GET("/tabs_by_name", s.FindTabsByName)
+	r.GET("/category/{name}", s.GetAuthorsByCategory)
 	return r, nil
 }
 
@@ -66,4 +68,40 @@ func (s *service) GetAuthorsByName(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, result)
+}
+
+// FindTabsByName возвращает список табулатур и количество их исполнителей через поиск по подстроке
+func (s *service) FindTabsByName(c *gin.Context) {
+	searchString := c.Query("search")
+	log.Println("New request for searching tabs by substring", searchString)
+	results, err := s.db.getTabsByName(searchString)
+	if err != nil {
+		log.Println("Can't get tabs by substring", searchString, "from database.", err)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Can't get tabs by substring",
+			},
+		)
+		return
+	}
+	c.JSON(http.StatusOK, results)
+}
+
+// GetAuthorsByCategory поиск по категориям
+func (s *service) GetAuthorsByCategory(c *gin.Context) {
+	category := c.Param("name")
+	log.Println("New request for searching by category", category)
+	results, err := s.db.getMusiciansByCategory(category)
+	if err != nil {
+		log.Println("Can't get musicians by category", category, "from database.", err)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Can't get musicians by category",
+			},
+		)
+		return
+	}
+	c.JSON(http.StatusOK, results)
 }
