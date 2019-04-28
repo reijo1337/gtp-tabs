@@ -17,8 +17,29 @@ message TabWithSize {
     double Size = 3;
 }
 
+message Category {
+    string Name = 1;
+}
+
+message Chunk {
+    bytes Content = 1;
+}
+
+enum UploadStatusCode {
+    Unknown = 0;
+    Ok = 1;
+    Failed = 2;
+}
+
+message UploadStatus {
+    string Message = 1;
+    UploadStatusCode Code = 2;
+}
+
 service Tabs {
     rpc GetAuthorsByLetter(SearchString) returns (stream MusicianWithCount) {}
     rpc GetAuthorsByName(SearchString) returns (stream MusicianWithCount) {}
     rpc FindTabsByName(SearchString) returns (stream TabWithSize) {}
+    rpc GetAuthorsByCategory(Category) returns (stream MusicianWithCount) {}
+    rpc Upload(stream Chunk) returns (UploadStatus) {}
 }

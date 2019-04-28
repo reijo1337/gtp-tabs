@@ -17,7 +17,8 @@ type Database struct {
 // SetUpDatabase устанавливает соединение с бд и разворачивает схему, если ее нет
 func SetUpDatabase() (*Database, error) {
 	log.Println("DB: Connecting to", DatabaseName, "database")
-	db, err := sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DatabaseUserName, DatabasePassword, DatabaseName))
+	db, err := sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=%s host=%s sslmode=disable",
+		DatabaseUserName, DatabasePassword, DatabaseName, DatabaseHost))
 	if err != nil {
 		return nil, err
 	}
@@ -125,6 +126,29 @@ func (db *Database) getTabsByName(searchString string) ([]*TabWithSize, error) {
 		var musicianID int32
 		rows.Scan(&musicianID, &(tabInfo.Name), &(tabInfo.Size))
 		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", musicianID).Scan(&(tabInfo.Musician)); err != nil {
+			return nil, err
+		}
+		ret = append(ret, tabInfo)
+	}
+	return ret, nil
+}
+
+func (db *Database) getMusiciansByCategory(category string) ([]*MusiciansWithCount, error) {
+	log.Println("DB: Getting musicians by category search:", category)
+	ret := make([]*MusiciansWithCount, 0)
+	var categoryID int32
+	err := db.QueryRow("SELECT id FROM categories WHERE (lower(name) = %1)", strings.ToLower(category)).Scan(&categoryID)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := db.Query("SELECT count(*) as c, author FROM tabs WHERE category = %1 GROUP BY author", categoryID)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var tabInfo *MusiciansWithCount
+		rows.Scan(&(tabInfo.Count), &(tabInfo.ID))
+		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", tabInfo.ID).Scan(&(tabInfo.Name)); err != nil {
 			return nil, err
 		}
 		ret = append(ret, tabInfo)

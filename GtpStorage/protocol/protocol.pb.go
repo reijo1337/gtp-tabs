@@ -22,6 +22,34 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type UploadStatusCode int32
+
+const (
+	UploadStatusCode_Unknown UploadStatusCode = 0
+	UploadStatusCode_Ok      UploadStatusCode = 1
+	UploadStatusCode_Failed  UploadStatusCode = 2
+)
+
+var UploadStatusCode_name = map[int32]string{
+	0: "Unknown",
+	1: "Ok",
+	2: "Failed",
+}
+
+var UploadStatusCode_value = map[string]int32{
+	"Unknown": 0,
+	"Ok":      1,
+	"Failed":  2,
+}
+
+func (x UploadStatusCode) String() string {
+	return proto.EnumName(UploadStatusCode_name, int32(x))
+}
+
+func (UploadStatusCode) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_2bc2336598a3f7e0, []int{0}
+}
+
 type SearchString struct {
 	Search               string   `protobuf:"bytes,1,opt,name=Search,proto3" json:"Search,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -163,32 +191,169 @@ func (m *TabWithSize) GetSize() float64 {
 	return 0
 }
 
+type Category struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Category) Reset()         { *m = Category{} }
+func (m *Category) String() string { return proto.CompactTextString(m) }
+func (*Category) ProtoMessage()    {}
+func (*Category) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2bc2336598a3f7e0, []int{3}
+}
+
+func (m *Category) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Category.Unmarshal(m, b)
+}
+func (m *Category) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Category.Marshal(b, m, deterministic)
+}
+func (m *Category) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Category.Merge(m, src)
+}
+func (m *Category) XXX_Size() int {
+	return xxx_messageInfo_Category.Size(m)
+}
+func (m *Category) XXX_DiscardUnknown() {
+	xxx_messageInfo_Category.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Category proto.InternalMessageInfo
+
+func (m *Category) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type Chunk struct {
+	Content              []byte   `protobuf:"bytes,1,opt,name=Content,proto3" json:"Content,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Chunk) Reset()         { *m = Chunk{} }
+func (m *Chunk) String() string { return proto.CompactTextString(m) }
+func (*Chunk) ProtoMessage()    {}
+func (*Chunk) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2bc2336598a3f7e0, []int{4}
+}
+
+func (m *Chunk) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Chunk.Unmarshal(m, b)
+}
+func (m *Chunk) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Chunk.Marshal(b, m, deterministic)
+}
+func (m *Chunk) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Chunk.Merge(m, src)
+}
+func (m *Chunk) XXX_Size() int {
+	return xxx_messageInfo_Chunk.Size(m)
+}
+func (m *Chunk) XXX_DiscardUnknown() {
+	xxx_messageInfo_Chunk.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Chunk proto.InternalMessageInfo
+
+func (m *Chunk) GetContent() []byte {
+	if m != nil {
+		return m.Content
+	}
+	return nil
+}
+
+type UploadStatus struct {
+	Message              string           `protobuf:"bytes,1,opt,name=Message,proto3" json:"Message,omitempty"`
+	Code                 UploadStatusCode `protobuf:"varint,2,opt,name=Code,proto3,enum=protocol.UploadStatusCode" json:"Code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
+}
+
+func (m *UploadStatus) Reset()         { *m = UploadStatus{} }
+func (m *UploadStatus) String() string { return proto.CompactTextString(m) }
+func (*UploadStatus) ProtoMessage()    {}
+func (*UploadStatus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2bc2336598a3f7e0, []int{5}
+}
+
+func (m *UploadStatus) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UploadStatus.Unmarshal(m, b)
+}
+func (m *UploadStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UploadStatus.Marshal(b, m, deterministic)
+}
+func (m *UploadStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UploadStatus.Merge(m, src)
+}
+func (m *UploadStatus) XXX_Size() int {
+	return xxx_messageInfo_UploadStatus.Size(m)
+}
+func (m *UploadStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_UploadStatus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UploadStatus proto.InternalMessageInfo
+
+func (m *UploadStatus) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+func (m *UploadStatus) GetCode() UploadStatusCode {
+	if m != nil {
+		return m.Code
+	}
+	return UploadStatusCode_Unknown
+}
+
 func init() {
+	proto.RegisterEnum("protocol.UploadStatusCode", UploadStatusCode_name, UploadStatusCode_value)
 	proto.RegisterType((*SearchString)(nil), "protocol.SearchString")
 	proto.RegisterType((*MusicianWithCount)(nil), "protocol.MusicianWithCount")
 	proto.RegisterType((*TabWithSize)(nil), "protocol.TabWithSize")
+	proto.RegisterType((*Category)(nil), "protocol.Category")
+	proto.RegisterType((*Chunk)(nil), "protocol.Chunk")
+	proto.RegisterType((*UploadStatus)(nil), "protocol.UploadStatus")
 }
 
 func init() { proto.RegisterFile("protocol.proto", fileDescriptor_2bc2336598a3f7e0) }
 
 var fileDescriptor_2bc2336598a3f7e0 = []byte{
-	// 244 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x28, 0xca, 0x2f,
-	0xc9, 0x4f, 0xce, 0xcf, 0xd1, 0x03, 0x33, 0x84, 0x38, 0x60, 0x7c, 0x25, 0x35, 0x2e, 0x9e, 0xe0,
-	0xd4, 0xc4, 0xa2, 0xe4, 0x8c, 0xe0, 0x92, 0xa2, 0xcc, 0xbc, 0x74, 0x21, 0x31, 0x2e, 0x36, 0x08,
-	0x5f, 0x82, 0x51, 0x81, 0x51, 0x83, 0x33, 0x08, 0xca, 0x53, 0xb2, 0xe5, 0x12, 0xf4, 0x2d, 0x2d,
-	0xce, 0x4c, 0xce, 0x4c, 0xcc, 0x0b, 0xcf, 0x2c, 0xc9, 0x70, 0xce, 0x2f, 0xcd, 0x2b, 0x11, 0x12,
-	0xe2, 0x62, 0xf1, 0x4b, 0xcc, 0x4d, 0x85, 0x2a, 0x05, 0xb3, 0x85, 0x44, 0xb8, 0x58, 0xc1, 0x92,
-	0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0xac, 0x41, 0x10, 0x8e, 0x52, 0x20, 0x17, 0x77, 0x48, 0x62, 0x12,
-	0x48, 0x67, 0x70, 0x66, 0x55, 0xaa, 0x90, 0x14, 0x17, 0x07, 0xcc, 0x34, 0xa8, 0x66, 0x38, 0x1f,
-	0x6e, 0x28, 0x13, 0x92, 0xa1, 0x42, 0x5c, 0x2c, 0x20, 0x7d, 0x12, 0xcc, 0x0a, 0x8c, 0x1a, 0x8c,
-	0x41, 0x60, 0xb6, 0xd1, 0x73, 0x46, 0x2e, 0x96, 0x90, 0xc4, 0xa4, 0x62, 0x21, 0x5f, 0x2e, 0x21,
-	0xf7, 0xd4, 0x12, 0xc7, 0xd2, 0x92, 0x8c, 0xfc, 0xa2, 0x62, 0xa7, 0x4a, 0x9f, 0xd4, 0x92, 0x92,
-	0xd4, 0x22, 0x21, 0x31, 0x3d, 0xb8, 0x9f, 0x91, 0x3d, 0x28, 0x25, 0x8d, 0x10, 0xc7, 0xf0, 0x90,
-	0x12, 0x83, 0x01, 0xa3, 0x90, 0x37, 0x97, 0x00, 0xb2, 0x71, 0x60, 0xfb, 0xc9, 0x36, 0xcc, 0x99,
-	0x8b, 0xcf, 0x2d, 0x33, 0x2f, 0x05, 0xe4, 0x4e, 0x02, 0x46, 0x89, 0x22, 0xc4, 0x91, 0x42, 0x0a,
-	0x64, 0x48, 0x12, 0x1b, 0x58, 0xc6, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x5d, 0xb0, 0xc1, 0xaa,
-	0xc6, 0x01, 0x00, 0x00,
+	// 383 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x51, 0xc1, 0xaa, 0xda, 0x40,
+	0x14, 0x75, 0xd2, 0x18, 0xed, 0x55, 0x6c, 0x7a, 0xb1, 0x12, 0x52, 0x28, 0x76, 0x16, 0x25, 0x74,
+	0x21, 0x45, 0xe9, 0xb2, 0x8b, 0x36, 0x60, 0x17, 0xad, 0x2d, 0x4d, 0x94, 0x76, 0x3b, 0x9a, 0xc1,
+	0x04, 0xed, 0x8c, 0x24, 0x13, 0x8a, 0xfd, 0xe5, 0xf7, 0x13, 0x8f, 0x4c, 0x12, 0x13, 0xde, 0x13,
+	0x84, 0xb7, 0x9b, 0x73, 0xef, 0x39, 0x67, 0x0e, 0xf7, 0xc0, 0xe8, 0x94, 0x4a, 0x25, 0x77, 0xf2,
+	0x38, 0xd3, 0x0f, 0xec, 0xd7, 0x98, 0xbe, 0x83, 0x61, 0xc8, 0x59, 0xba, 0x8b, 0x43, 0x95, 0x26,
+	0x62, 0x8f, 0x13, 0xb0, 0x4a, 0xec, 0x90, 0x29, 0xf1, 0x9e, 0x07, 0x15, 0xa2, 0x9f, 0xe0, 0xe5,
+	0x2a, 0xcf, 0x92, 0x5d, 0xc2, 0xc4, 0xef, 0x44, 0xc5, 0xbe, 0xcc, 0x85, 0x42, 0x04, 0xf3, 0x07,
+	0xfb, 0xcb, 0x2b, 0xaa, 0x7e, 0xe3, 0x18, 0xba, 0x7a, 0xe9, 0x18, 0x53, 0xe2, 0x75, 0x83, 0x12,
+	0xd0, 0x5f, 0x30, 0x58, 0xb3, 0x6d, 0xa1, 0x0c, 0x93, 0xff, 0x1c, 0x5d, 0xe8, 0xd7, 0x6e, 0x95,
+	0xf8, 0x82, 0x2f, 0xa6, 0x46, 0xcb, 0x14, 0xc1, 0x2c, 0x74, 0xce, 0xb3, 0x29, 0xf1, 0x48, 0xa0,
+	0xdf, 0xf4, 0x0d, 0xf4, 0x7d, 0xa6, 0xf8, 0x5e, 0xa6, 0xe7, 0x6b, 0x41, 0xe8, 0x5b, 0xe8, 0xfa,
+	0x71, 0x2e, 0x0e, 0xe8, 0x40, 0xcf, 0x97, 0x42, 0x71, 0xa1, 0xf4, 0x7e, 0x18, 0xd4, 0x90, 0xfe,
+	0x81, 0xe1, 0xe6, 0x74, 0x94, 0x2c, 0x0a, 0x15, 0x53, 0x79, 0x56, 0x30, 0x57, 0x3c, 0xcb, 0xd8,
+	0xbe, 0x76, 0xaa, 0x21, 0xce, 0xc0, 0xf4, 0x65, 0x54, 0x86, 0x1a, 0xcd, 0xdd, 0xd9, 0xe5, 0x9e,
+	0x6d, 0x7d, 0xc1, 0x08, 0x34, 0xef, 0xfd, 0x02, 0xec, 0x87, 0x1b, 0x1c, 0x40, 0x6f, 0x23, 0x0e,
+	0x42, 0xfe, 0x13, 0x76, 0x07, 0x2d, 0x30, 0x7e, 0x1e, 0x6c, 0x82, 0x00, 0xd6, 0x92, 0x25, 0x47,
+	0x1e, 0xd9, 0xc6, 0xfc, 0xce, 0x00, 0x73, 0xcd, 0xb6, 0x19, 0xae, 0x00, 0xbf, 0x72, 0xf5, 0x39,
+	0x57, 0xb1, 0x4c, 0xb3, 0x2f, 0xe7, 0xef, 0x5c, 0x29, 0x9e, 0xe2, 0xa4, 0xf9, 0xb5, 0x5d, 0x99,
+	0xfb, 0xba, 0x99, 0x3f, 0xaa, 0x88, 0x76, 0x3e, 0x10, 0xfc, 0x06, 0x76, 0xdb, 0x4e, 0x5f, 0xf4,
+	0xc9, 0x66, 0x3e, 0x8c, 0x96, 0x89, 0x88, 0x8a, 0x9c, 0x37, 0xac, 0x5e, 0x35, 0xf3, 0x56, 0xf7,
+	0x55, 0xa2, 0x71, 0x3b, 0x51, 0xd3, 0x63, 0x23, 0xa9, 0x67, 0xb7, 0x13, 0x7d, 0x04, 0xab, 0xbc,
+	0x35, 0xbe, 0x68, 0xc9, 0x8b, 0xea, 0xdd, 0xc9, 0xf5, 0xa2, 0x68, 0xc7, 0x23, 0x5b, 0x4b, 0xaf,
+	0x16, 0xf7, 0x01, 0x00, 0x00, 0xff, 0xff, 0x18, 0x9c, 0x2e, 0x87, 0x1c, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -206,6 +371,8 @@ type TabsClient interface {
 	GetAuthorsByLetter(ctx context.Context, in *SearchString, opts ...grpc.CallOption) (Tabs_GetAuthorsByLetterClient, error)
 	GetAuthorsByName(ctx context.Context, in *SearchString, opts ...grpc.CallOption) (Tabs_GetAuthorsByNameClient, error)
 	FindTabsByName(ctx context.Context, in *SearchString, opts ...grpc.CallOption) (Tabs_FindTabsByNameClient, error)
+	GetAuthorsByCategory(ctx context.Context, in *Category, opts ...grpc.CallOption) (Tabs_GetAuthorsByCategoryClient, error)
+	Upload(ctx context.Context, opts ...grpc.CallOption) (Tabs_UploadClient, error)
 }
 
 type tabsClient struct {
@@ -312,11 +479,79 @@ func (x *tabsFindTabsByNameClient) Recv() (*TabWithSize, error) {
 	return m, nil
 }
 
+func (c *tabsClient) GetAuthorsByCategory(ctx context.Context, in *Category, opts ...grpc.CallOption) (Tabs_GetAuthorsByCategoryClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Tabs_serviceDesc.Streams[3], "/protocol.Tabs/GetAuthorsByCategory", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &tabsGetAuthorsByCategoryClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Tabs_GetAuthorsByCategoryClient interface {
+	Recv() (*MusicianWithCount, error)
+	grpc.ClientStream
+}
+
+type tabsGetAuthorsByCategoryClient struct {
+	grpc.ClientStream
+}
+
+func (x *tabsGetAuthorsByCategoryClient) Recv() (*MusicianWithCount, error) {
+	m := new(MusicianWithCount)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *tabsClient) Upload(ctx context.Context, opts ...grpc.CallOption) (Tabs_UploadClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Tabs_serviceDesc.Streams[4], "/protocol.Tabs/Upload", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &tabsUploadClient{stream}
+	return x, nil
+}
+
+type Tabs_UploadClient interface {
+	Send(*Chunk) error
+	CloseAndRecv() (*UploadStatus, error)
+	grpc.ClientStream
+}
+
+type tabsUploadClient struct {
+	grpc.ClientStream
+}
+
+func (x *tabsUploadClient) Send(m *Chunk) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *tabsUploadClient) CloseAndRecv() (*UploadStatus, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(UploadStatus)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // TabsServer is the server API for Tabs service.
 type TabsServer interface {
 	GetAuthorsByLetter(*SearchString, Tabs_GetAuthorsByLetterServer) error
 	GetAuthorsByName(*SearchString, Tabs_GetAuthorsByNameServer) error
 	FindTabsByName(*SearchString, Tabs_FindTabsByNameServer) error
+	GetAuthorsByCategory(*Category, Tabs_GetAuthorsByCategoryServer) error
+	Upload(Tabs_UploadServer) error
 }
 
 func RegisterTabsServer(s *grpc.Server, srv TabsServer) {
@@ -386,6 +621,53 @@ func (x *tabsFindTabsByNameServer) Send(m *TabWithSize) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Tabs_GetAuthorsByCategory_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Category)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(TabsServer).GetAuthorsByCategory(m, &tabsGetAuthorsByCategoryServer{stream})
+}
+
+type Tabs_GetAuthorsByCategoryServer interface {
+	Send(*MusicianWithCount) error
+	grpc.ServerStream
+}
+
+type tabsGetAuthorsByCategoryServer struct {
+	grpc.ServerStream
+}
+
+func (x *tabsGetAuthorsByCategoryServer) Send(m *MusicianWithCount) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Tabs_Upload_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(TabsServer).Upload(&tabsUploadServer{stream})
+}
+
+type Tabs_UploadServer interface {
+	SendAndClose(*UploadStatus) error
+	Recv() (*Chunk, error)
+	grpc.ServerStream
+}
+
+type tabsUploadServer struct {
+	grpc.ServerStream
+}
+
+func (x *tabsUploadServer) SendAndClose(m *UploadStatus) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *tabsUploadServer) Recv() (*Chunk, error) {
+	m := new(Chunk)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 var _Tabs_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "protocol.Tabs",
 	HandlerType: (*TabsServer)(nil),
@@ -405,6 +687,16 @@ var _Tabs_serviceDesc = grpc.ServiceDesc{
 			StreamName:    "FindTabsByName",
 			Handler:       _Tabs_FindTabsByName_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "GetAuthorsByCategory",
+			Handler:       _Tabs_GetAuthorsByCategory_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Upload",
+			Handler:       _Tabs_Upload_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "protocol.proto",

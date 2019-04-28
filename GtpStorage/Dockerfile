@@ -13,7 +13,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN go get -u github.com/golang/protobuf/{proto,protoc-gen-go} && \
 go get -u google.golang.org/grpc && \
-go get github.com/DATA-DOG/go-sqlmock \
+# go get github.com/DATA-DOG/go-sqlmock \
 # go get -u golang.org/x/net/context && \
 # go get github.com/dgrijalva/jwt-go && \
 go get github.com/lib/pq

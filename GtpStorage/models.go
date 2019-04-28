@@ -11,5 +11,5 @@ type MusiciansWithCount struct {
 type TabWithSize struct {
 	Musician string
 	Name     string
-	Size     int32
+	Size     float64
 }
