@@ -23,6 +23,7 @@ message Category {
 
 message Chunk {
     bytes Content = 1;
+    string Filename = 2;
 }
 
 enum UploadStatusCode {
@@ -36,10 +37,19 @@ message UploadStatus {
     UploadStatusCode Code = 2;
 }
 
+message DownloadRequest {
+    string Filename = 1;
+}
+  
+message DownloadResponse {
+    bytes Data = 1;
+}
+
 service Tabs {
     rpc GetAuthorsByLetter(SearchString) returns (stream MusicianWithCount) {}
     rpc GetAuthorsByName(SearchString) returns (stream MusicianWithCount) {}
     rpc FindTabsByName(SearchString) returns (stream TabWithSize) {}
     rpc GetAuthorsByCategory(Category) returns (stream MusicianWithCount) {}
     rpc Upload(stream Chunk) returns (UploadStatus) {}
+    rpc Download(DownloadRequest) returns (stream DownloadResponse) {}
 }

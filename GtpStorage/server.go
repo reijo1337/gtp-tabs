@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 )
@@ -110,29 +111,39 @@ func (s *Server) GetAuthorsByCategory(in *protocol.Category, p protocol.Tabs_Get
 // Upload загрузка файла на сервер через последовательность чанков, которые складываются в файл
 func (s *Server) Upload(stream protocol.Tabs_UploadServer) (err error) {
 	// while there are messages coming
-	buffer := make([]byte, 0)
+	buffer := make(map[string][]byte, 0)
 	for {
 		chunck, err := stream.Recv()
+		filename := chunck.GetFilename()
+		if _, ok := buffer[filename]; !ok {
+			buffer[filename] = make([]byte, 0)
+		}
 		if err != nil {
 			if err == io.EOF {
-				buffer = append(buffer, chunck.GetContent()...)
-				goto END
+				break
 			}
 
 			err = errors.Wrapf(err,
 				"неудачное чтение чанков")
 			return err
 		}
-		buffer = append(buffer, chunck.GetContent()...)
+		buffer[filename] = append(buffer[filename], chunck.GetContent()...)
 	}
-END:
-	file, err := os.Open("filename")
-	if err != nil {
-		return
+
+	files := make(map[string]*os.File, 0)
+	for filename := range buffer {
+		file, err := os.Open(filename)
+		if err != nil {
+			return err
+		}
+		files[filename] = file
 	}
-	_, err = file.Write(buffer)
-	if err != nil {
-		return
+
+	for filename, value := range buffer {
+		_, err = files[filename].Write(value)
+		if err != nil {
+			return
+		}
 	}
 	// once the transmission finished, send the
 	// confirmation if nothign went wrong
@@ -142,4 +153,31 @@ END:
 	})
 
 	return
+}
+
+// Download скачивание файла
+func (s *Server) Download(in *protocol.DownloadRequest, p protocol.Tabs_DownloadServer) error {
+	f, err := os.Open(filepath.Join(in.GetFilename()))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	var b [4096 * 1000]byte
+	for {
+		n, err := f.Read(b[:])
+		if err != nil {
+			if err != io.EOF {
+				return err
+			}
+			break
+		}
+		err = p.Send(&protocol.DownloadResponse{
+			Data: b[:n],
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
