@@ -32,11 +32,6 @@ func SetUpDatabase() (*Database, error) {
 
 	ddb := &Database{DB: db}
 
-	// log.Println("DB: Setting up start data")
-	// if err := setUpStartData(ddb); err != nil {
-	// 	return nil, err
-	// }
-
 	log.Println("DB: succesful setup")
 	return ddb, nil
 }
