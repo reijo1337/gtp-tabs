@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"fmt"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"

@@ -11,6 +11,6 @@ var (
 	ServerPort string
 	// DatabaseHost адрес бд
 	DatabaseHost string
-	Iss = "authService"
-	Aud = []string{"client1", "client2"}
+	Iss          = "authService"
+	Aud          = []string{"client1", "client2"}
 )

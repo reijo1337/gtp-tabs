@@ -1,10 +1,10 @@
 package main
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"fmt"
 	"log"
-	"crypto/sha256"
 
 	_ "github.com/lib/pq"
 )
@@ -38,10 +38,18 @@ func SetUpDatabase() (*Database, error) {
 
 func createSchema(db *sql.DB) error {
 	if _, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS roles (
+			id SERIAL NOT NULL PRIMARY KEY,
+			name VARCHAR(20) UNIQUE NOT NULL,
+		)`); err != nil {
+		return err
+	}
+	if _, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL NOT NULL PRIMARY KEY,
 			login VARCHAR(20) UNIQUE NOT NULL,
-			passhash VARCHAR(70) NOT NULL
+			passhash VARCHAR(70) NOT NULL,
+			role INT NOT NULL
 		)`); err != nil {
 		return err
 	}
@@ -49,30 +57,29 @@ func createSchema(db *sql.DB) error {
 	return nil
 }
 
-func (db *Database) insertNewUser(login string, password string) (*user, error) {
-	log.Println("DB: Inserting new user ", login)
+func (db *Database) insertNewUser(login string, password string, role string) (*user, error) {
+	log.Println("DB: Inserting new user", login, "with role", role)
+	var roleID int32
+	err := db.QueryRow("SELECT id FROM roles WHERE name = $1", role).Scan(&roleID)
+	if err != nil {
+		return nil, err
+	}
 	passHash := sha256.New()
 	passHash.Write([]byte(password))
 	pass := passHash.Sum(nil)
 	passStr := fmt.Sprintf("%x\n", pass)
 
-	rows, err := db.Query("SELECT id FROM users WHERE login = $1", login)
-
-	if err != nil {
-		return nil, err
-	}
-
 	var ID int32
-	for rows.Next() {
-		rows.Scan(&ID)
+	if err = db.QueryRow("SELECT id FROM users WHERE login = $1 and role = $2", login, roleID).Scan(&ID); err != nil {
+		return nil, err
 	}
 
 	if ID > 0 {
 		return &user{ID: ID, Login: login, Password: password}, nil
 	}
 
-	row := db.QueryRow("INSERT INTO users (login, passhash) VALUES ($1, $2) RETURNING id",
-		login, passStr)
+	row := db.QueryRow("INSERT INTO users (login, passhash, role) VALUES ($1, $2, $3) RETURNING id",
+		login, passStr, roleID)
 	if err := row.Scan(&ID); err != nil {
 		return nil, err
 	}
@@ -81,6 +88,10 @@ func (db *Database) insertNewUser(login string, password string) (*user, error) 
 		ID:       ID,
 		Login:    login,
 		Password: password,
+		Role: Role{
+			ID:   roleID,
+			Name: role,
+		},
 	}, nil
 }
 
