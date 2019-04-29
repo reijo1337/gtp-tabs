@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,6 +33,8 @@ func SetUpRouter() (*gin.Engine, error) {
 	r.GET("/author_by_name", s.GetAuthorsByName)
 	r.GET("/tabs_by_name", s.FindTabsByName)
 	r.GET("/category/{name}", s.GetAuthorsByCategory)
+	r.PUT("/file", s.Upload)
+	r.GET("/file", s.Download)
 	return r, nil
 }
 
@@ -104,4 +108,83 @@ func (s *service) GetAuthorsByCategory(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, results)
+}
+
+// Upload загрузка файла на сервер
+func (s *service) Upload(c *gin.Context) {
+	filename := c.GetHeader("Filename")
+	fileBody, err := c.GetRawData()
+	if err != nil {
+		log.Println("Can't get file", err)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Can't get file",
+			},
+		)
+		return
+	}
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0755)
+	if err != nil {
+		log.Println("Can't save file", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't save file",
+			},
+		)
+		return
+	}
+	_, err = file.Write(fileBody)
+	if err != nil {
+		log.Println("Can't save file", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't save file",
+			},
+		)
+		return
+	}
+	c.JSON(
+		http.StatusOK,
+		gin.H{
+			"ok": "ok",
+		},
+	)
+}
+
+// Download скачивание файла
+func (s *service) Download(c *gin.Context) {
+	filename := c.GetHeader("Filename")
+	f, err := os.Open(filepath.Join(filename))
+	if err != nil {
+		log.Println("Can't send file", filename, err)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Can't send file",
+			},
+		)
+		return
+	}
+	defer f.Close()
+	fileStats, err := f.Stat()
+	if err != nil {
+		log.Println("Can't send file", filename, err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't get info about file",
+			},
+		)
+		return
+	}
+	contentLength := fileStats.Size()
+	contentType := "application/octet-stream"
+	extraHeaders := map[string]string{
+		"Content-Disposition": `attachment; filename="` + filename + `"`,
+	}
+
+	c.DataFromReader(http.StatusOK, contentLength, contentType, f, extraHeaders)
 }
