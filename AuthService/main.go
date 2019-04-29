@@ -31,10 +31,10 @@ func init() {
 
 func main() {
 	log.SetFlags(log.LstdFlags)
-	// r, err := SetUpRouter()
-	// if err != nil {
-		// log.Panicln("Can't set up server:", err)
-	// }
-	// log.Println("Starting server on port ", ServerPort)
-	// r.Run(":" + ServerPort)
+	r, err := SetUpRouter()
+	if err != nil {
+		log.Panicln("Can't set up server:", err)
+	}
+	log.Println("Starting server on port ", ServerPort)
+	r.Run(":" + ServerPort)
 }

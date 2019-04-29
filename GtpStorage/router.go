@@ -14,7 +14,7 @@ type service struct {
 }
 
 func makeService(db *Database) (*service, error) {
-	log.Println("Server: Set up book service...")
+	log.Println("Server: Set up storage service...")
 	return &service{db: db}, nil
 }
 
