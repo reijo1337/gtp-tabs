@@ -130,16 +130,16 @@ func genToken(login string) (*tokens, error) {
 	log.Println("Server: Gen access token")
 	accesToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"login": login,
-		"iss":   Iss,
+		"iss":   iss,
 		"exp":   AccessTokenExp,
-		"aud":   Aud,
+		"aud":   aud,
 	})
 	log.Println("Server: Gen refresh token")
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"login": login,
-		"iss":   Iss,
+		"iss":   iss,
 		"exp":   RefreshTokenExp,
-		"aud":   Aud,
+		"aud":   aud,
 	})
 
 	log.Println("Server: Signing access token", accesToken, hmacSampleSecret)

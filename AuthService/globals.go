@@ -1,6 +1,6 @@
 package main
 
 var (
-	Iss          = "authService"
-	Aud          = []string{"client1", "client2"}
+	iss          = "authService"
+	aud          = []string{"client1", "client2"}
 )

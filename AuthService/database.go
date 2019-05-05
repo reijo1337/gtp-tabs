@@ -44,7 +44,7 @@ func createSchema(db *sql.DB) error {
 	if _, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS roles (
 			id SERIAL NOT NULL PRIMARY KEY,
-			name VARCHAR(20) UNIQUE NOT NULL,
+			name VARCHAR(20) UNIQUE NOT NULL
 		)`); err != nil {
 		return err
 	}
