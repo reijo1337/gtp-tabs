@@ -6,7 +6,7 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags)
-	config, err := parseConfig("STORAGE")
+	config, err := parseConfig("AUTH")
 	if err != nil {
 		log.Panicln("Can't read config:", err)
 	}

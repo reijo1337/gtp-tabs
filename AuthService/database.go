@@ -16,7 +16,7 @@ type Database struct {
 
 // SetUpDatabase устанавливает соединение с бд и разворачивает схему, если ее нет
 func SetUpDatabase() (*Database, error) {
-	config, err := parseConfig("STORAGE")
+	config, err := parseConfig("AUTH")
 	if err != nil {
 		return nil, err
 	}
