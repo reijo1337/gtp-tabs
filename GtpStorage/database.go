@@ -16,9 +16,13 @@ type Database struct {
 
 // SetUpDatabase устанавливает соединение с бд и разворачивает схему, если ее нет
 func SetUpDatabase() (*Database, error) {
-	log.Println("DB: Connecting to", DatabaseName, "database")
+	config, err := parseConfig("STORAGE")
+	if err != nil {
+		return nil, err
+	}
+	log.Println("DB: Connecting to", config.DB.Name, "database")
 	db, err := sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=%s host=%s sslmode=disable",
-		DatabaseUserName, DatabasePassword, DatabaseName, DatabaseHost))
+		config.DB.User, config.DB.Password, config.DB.Name, config.DB.Host))
 	if err != nil {
 		return nil, err
 	}
