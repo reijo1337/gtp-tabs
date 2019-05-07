@@ -104,6 +104,30 @@ func (ch *clientHolder) getAuthorsByName(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+func (ch *clientHolder) getTabsByName(c *gin.Context) {
+	search := c.Query("search")
+	if search == "" {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "search required",
+			},
+		)
+		return
+	}
+	result, err := ch.storage.FindTabsByName(search)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
 func setUpRouter() (*gin.Engine, error) {
 	r := gin.Default()
 	ch, err := setUpClientHolder()
@@ -113,6 +137,7 @@ func setUpRouter() (*gin.Engine, error) {
 	authorized := r.Group("/", authRequired())
 	authorized.GET("/alph/:code", ch.getAuthorsByLetter)
 	authorized.GET("/musicians", ch.getAuthorsByName)
+	authorized.GET("/tabs", ch.getTabsByName)
 	// authorized.GET("/getUserArrears", getUserArrears)
 	// authorized.POST("/arrear", newArear)
 	// authorized.DELETE("/arrear", closeArrear)

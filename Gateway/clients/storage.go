@@ -17,7 +17,7 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 type StorageClientInterface interface {
 	GetAuthorsByLetter(letter string) ([]MusiciansWithCount, error)
 	GetAuthorsByName(search string) ([]MusiciansWithCount, error)
-	// FindTabsByName(search string) ([]*TabWithSize, error)
+	FindTabsByName(search string) ([]TabWithSize, error)
 	// GetAuthorsByCategory(name string) ([]*MusiciansWithCount, error)
 }
 
@@ -68,6 +68,36 @@ func (sc *StorageClient) returnMusicians(resp *http.Response) ([]MusiciansWithCo
 	}
 
 	ret := make([]MusiciansWithCount, 0)
+	err = json.Unmarshal(body, &ret)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
+func (sc *StorageClient) FindTabsByName(search string) ([]TabWithSize, error) {
+	log.Println("GetAuthorsByName", search)
+	resp, err := http.Get(fmt.Sprintf("%s/tabs?search=%s", sc.url, strings.Replace(search, " ", "+", -1)))
+	if err != nil {
+		log.Println("Can't get musicians from service", err)
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Can't read body", err)
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		errResp := ErrorResponse{}
+		err = json.Unmarshal(body, &errResp)
+		if err != nil {
+			return nil, err
+		}
+		return nil, errors.New(errResp.Error)
+	}
+
+	ret := make([]TabWithSize, 0)
 	err = json.Unmarshal(body, &ret)
 	if err != nil {
 		return nil, err
