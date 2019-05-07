@@ -31,8 +31,8 @@ func SetUpRouter() (*gin.Engine, error) {
 		return nil, err
 	}
 	r.GET("/letter/musicians/:code", s.GetAuthorsByLetter)
-	r.GET("/name/musicians/:search", s.GetAuthorsByName)
-	r.GET("/name/tabs/:search", s.FindTabsByName)
+	r.GET("/musicians", s.GetAuthorsByName)
+	r.GET("/tabs", s.FindTabsByName)
 	r.GET("/category/:name", s.GetAuthorsByCategory)
 	r.PUT("/file", s.Upload)
 	r.GET("/file", s.Download)
@@ -87,7 +87,7 @@ func (s *service) GetAuthorsByLetter(c *gin.Context) {
 
 // GetAuthorsByName возвращает список музыкантов и количество их исполнителей через поиск по подстроке
 func (s *service) GetAuthorsByName(c *gin.Context) {
-	searchString := c.Param("search")
+	searchString := c.Query("search")
 	log.Println("New request for searching musicians by substing", searchString)
 	result, err := s.db.getMusicians(searchString)
 	if err != nil {
@@ -105,7 +105,7 @@ func (s *service) GetAuthorsByName(c *gin.Context) {
 
 // FindTabsByName возвращает список табулатур и количество их исполнителей через поиск по подстроке
 func (s *service) FindTabsByName(c *gin.Context) {
-	searchString := c.Param("search")
+	searchString := c.Query("search")
 	log.Println("New request for searching tabs by substring", searchString)
 	results, err := s.db.getTabsByName(searchString)
 	if err != nil {

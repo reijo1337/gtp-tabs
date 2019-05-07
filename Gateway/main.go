@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
-	jwt "github.com/dgrijalva/jwt-go"
+	// "fmt"
+	// jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 )
 
 type clientHolder struct {
-	storage *clients.StorageClient
+	storage clients.StorageClientInterface
 }
 
 func setUpClientHolder() (*clientHolder, error) {
@@ -28,45 +28,70 @@ func setUpClientHolder() (*clientHolder, error) {
 
 func authRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Println("Gateway: New authorized request")
-		tokenString := c.Query("access_token")
-		if tokenString == "" {
-			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
-				gin.H{
-					"error": "Unauthorized",
-				},
-			)
-		}
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// hmacSampleSecret := os.Getenv("SECRET")
-			hmacSampleSecret := []byte("secc")
-			// Don't forget to validate the alg is what you expect:
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			}
+		// log.Println("Gateway: New authorized request")
+		// tokenString := c.Query("access_token")
+		// if tokenString == "" {
+		// 	c.AbortWithStatusJSON(
+		// 		http.StatusUnauthorized,
+		// 		gin.H{
+		// 			"error": "Unauthorized",
+		// 		},
+		// 	)
+		// }
+		// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// 	// hmacSampleSecret := os.Getenv("SECRET")
+		// 	hmacSampleSecret := []byte("secc")
+		// 	// Don't forget to validate the alg is what you expect:
+		// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		// 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		// 	}
 
-			// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-			return hmacSampleSecret, nil
-		})
+		// 	// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		// 	return hmacSampleSecret, nil
+		// })
 
-		if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			c.Next()
-		} else {
-			log.Println("Gateway: Authorization failed: ", err.Error())
-			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
-				gin.H{
-					"error": "Unauthorized",
-				},
-			)
-		}
+		// if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// 	c.Next()
+		// } else {
+		// 	log.Println("Gateway: Authorization failed: ", err.Error())
+		// 	c.AbortWithStatusJSON(
+		// 		http.StatusUnauthorized,
+		// 		gin.H{
+		// 			"error": "Unauthorized",
+		// 		},
+		// 	)
+		// }
+		c.Next()
 	}
 }
 
 func (ch *clientHolder) getAuthorsByLetter(c *gin.Context) {
 	code := c.Param("code")
 	result, err := ch.storage.GetAuthorsByLetter(code)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+func (ch *clientHolder) getAuthorsByName(c *gin.Context) {
+	search := c.Query("search")
+	if search == "" {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "search required",
+			},
+		)
+		return
+	}
+	result, err := ch.storage.GetAuthorsByName(search)
 	if err != nil {
 		c.JSON(
 			http.StatusBadRequest,
@@ -87,6 +112,7 @@ func setUpRouter() (*gin.Engine, error) {
 	}
 	authorized := r.Group("/", authRequired())
 	authorized.GET("/alph/:code", ch.getAuthorsByLetter)
+	authorized.GET("/musicians", ch.getAuthorsByName)
 	// authorized.GET("/getUserArrears", getUserArrears)
 	// authorized.POST("/arrear", newArear)
 	// authorized.DELETE("/arrear", closeArrear)
