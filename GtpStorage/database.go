@@ -73,7 +73,7 @@ func createSchema(db *sql.DB) error {
 	return nil
 }
 
-func (db *Database) getMusiciansByLetter(searchString string) ([]*MusiciansWithCount, error) {
+func (db *Database) getMusiciansByLetter(searchString string) ([]MusiciansWithCount, error) {
 	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
 	lowerSearchString := strings.ToLower(searchString)
 	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '" + lowerSearchString + "%')")
@@ -83,11 +83,20 @@ func (db *Database) getMusiciansByLetter(searchString string) ([]*MusiciansWithC
 	return db.getMusiciansWithCount(rows)
 }
 
-func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]*MusiciansWithCount, error) {
-	result := make([]*MusiciansWithCount, 0)
+func (db *Database) getMusiciansByNumber() ([]MusiciansWithCount, error) {
+	log.Println("DB: Getting musicians by search request: numbers")
+	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '[0-9]%')")
+	if err != nil {
+		return nil, err
+	}
+	return db.getMusiciansWithCount(rows)
+}
+
+func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]MusiciansWithCount, error) {
+	result := make([]MusiciansWithCount, 0)
 	for rows.Next() {
-		var resMusician *MusiciansWithCount
-		rows.Scan(&(resMusician.ID), &(resMusician.Name))
+		var resMusician MusiciansWithCount
+		rows.Scan(&resMusician.ID, &resMusician.Name)
 		result = append(result, resMusician)
 	}
 
@@ -102,7 +111,7 @@ func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]*MusiciansWithCount
 	return result, nil
 }
 
-func (db *Database) getMusicians(searchString string) ([]*MusiciansWithCount, error) {
+func (db *Database) getMusicians(searchString string) ([]MusiciansWithCount, error) {
 	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
 	lowerSearchString := strings.ToLower(searchString)
 	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '%" + lowerSearchString + "%')")
@@ -112,18 +121,18 @@ func (db *Database) getMusicians(searchString string) ([]*MusiciansWithCount, er
 	return db.getMusiciansWithCount(rows)
 }
 
-func (db *Database) getTabsByName(searchString string) ([]*TabWithSize, error) {
+func (db *Database) getTabsByName(searchString string) ([]TabWithSize, error) {
 	log.Printf("DB: Getting tabs with size by search request: %s\n", searchString)
-	ret := make([]*TabWithSize, 0)
+	ret := make([]TabWithSize, 0)
 	lowerSearchString := strings.ToLower(searchString)
 	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%$1%')", lowerSearchString)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
-		var tabInfo *TabWithSize
+		var tabInfo TabWithSize
 		var musicianID int32
-		rows.Scan(&musicianID, &(tabInfo.Name), &(tabInfo.Size))
+		rows.Scan(&musicianID, &tabInfo.Name, &tabInfo.Size)
 		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", musicianID).Scan(&(tabInfo.Musician)); err != nil {
 			return nil, err
 		}
@@ -132,9 +141,9 @@ func (db *Database) getTabsByName(searchString string) ([]*TabWithSize, error) {
 	return ret, nil
 }
 
-func (db *Database) getMusiciansByCategory(category string) ([]*MusiciansWithCount, error) {
+func (db *Database) getMusiciansByCategory(category string) ([]MusiciansWithCount, error) {
 	log.Println("DB: Getting musicians by category search:", category)
-	ret := make([]*MusiciansWithCount, 0)
+	ret := make([]MusiciansWithCount, 0)
 	var categoryID int32
 	err := db.QueryRow("SELECT id FROM categories WHERE (lower(name) = %1)", strings.ToLower(category)).Scan(&categoryID)
 	if err != nil {
@@ -145,8 +154,8 @@ func (db *Database) getMusiciansByCategory(category string) ([]*MusiciansWithCou
 		return nil, err
 	}
 	for rows.Next() {
-		var tabInfo *MusiciansWithCount
-		rows.Scan(&(tabInfo.Count), &(tabInfo.ID))
+		var tabInfo MusiciansWithCount
+		rows.Scan(&tabInfo.Count, &tabInfo.ID)
 		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", tabInfo.ID).Scan(&(tabInfo.Name)); err != nil {
 			return nil, err
 		}

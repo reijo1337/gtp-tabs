@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +30,7 @@ func SetUpRouter() (*gin.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.GET("/authors_by_letter", s.GetAuthorsByLetter)
+	r.GET("/letter/musicians/:code", s.GetAuthorsByLetter)
 	r.GET("/author_by_name", s.GetAuthorsByName)
 	r.GET("/tabs_by_name", s.FindTabsByName)
 	r.GET("/category/:name", s.GetAuthorsByCategory)
@@ -40,9 +41,37 @@ func SetUpRouter() (*gin.Engine, error) {
 
 // GetAuthorsByLetter возвращает список музыкантов и количество их исполнителей через поиск по первой букве
 func (s *service) GetAuthorsByLetter(c *gin.Context) {
-	letter := c.Query("letter")
+	var (
+		err    error
+		result []MusiciansWithCount
+	)
+	letter := c.Param("code")
 	log.Println("New request for searching musicians by letter code", letter)
-	result, err := s.db.getMusiciansByLetter(letter)
+	code, err := strconv.Atoi(letter)
+	if err != nil {
+		log.Println("Can't get code.", err)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Can't get code",
+			},
+		)
+		return
+	}
+	if code == 0 {
+		result, err = s.db.getMusiciansByNumber()
+	} else if !(code > 64 && code < 91) && !(code > 1039 && code < 1072) {
+		log.Println("Wrong code ", code)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Wrong code",
+			},
+		)
+		return
+	} else {
+		result, err = s.db.getMusiciansByLetter(string(code))
+	}
 	if err != nil {
 		log.Println("Can't get musicians by letter", letter, "from database.", err)
 		c.JSON(
