@@ -125,7 +125,7 @@ func (db *Database) getTabsByName(searchString string) ([]TabWithSize, error) {
 	log.Printf("DB: Getting tabs with size by search request: %s\n", searchString)
 	ret := make([]TabWithSize, 0)
 	lowerSearchString := strings.ToLower(searchString)
-	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%$1%')", lowerSearchString)
+	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%"+ lowerSearchString+"%')")
 	if err != nil {
 		return nil, err
 	}
