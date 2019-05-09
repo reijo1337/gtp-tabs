@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"strconv"
 	"strings"
 
 	_ "github.com/lib/pq"
@@ -20,7 +20,6 @@ func SetUpDatabase() (*Database, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println("DB: Connecting to", config.DB.Name, "database")
 	db, err := sql.Open("postgres", fmt.Sprintf("user=%s password=%s dbname=%s host=%s sslmode=disable",
 		config.DB.User, config.DB.Password, config.DB.Name, config.DB.Host))
 	if err != nil {
@@ -29,14 +28,12 @@ func SetUpDatabase() (*Database, error) {
 
 	db.SetMaxOpenConns(100)
 
-	log.Println("Creating schema")
 	if err := createSchema(db); err != nil {
 		return nil, err
 	}
 
 	ddb := &Database{DB: db}
 
-	log.Println("DB: succesful setup")
 	return ddb, nil
 }
 
@@ -64,7 +61,7 @@ func createSchema(db *sql.DB) error {
 			author INT NOT NULL REFERENCES musicians (id),
 			name VARCHAR(50) NOT NULL UNIQUE,
 			category INT NOT NULL REFERENCES categories (id),
-			size REAL DEFAULT 0
+			size BIGINT DEFAULT 0
 		)
 	`); err != nil {
 		return err
@@ -74,7 +71,6 @@ func createSchema(db *sql.DB) error {
 }
 
 func (db *Database) getMusiciansByLetter(searchString string) ([]MusiciansWithCount, error) {
-	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
 	lowerSearchString := strings.ToLower(searchString)
 	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '" + lowerSearchString + "%')")
 	if err != nil {
@@ -84,7 +80,6 @@ func (db *Database) getMusiciansByLetter(searchString string) ([]MusiciansWithCo
 }
 
 func (db *Database) getMusiciansByNumber() ([]MusiciansWithCount, error) {
-	log.Println("DB: Getting musicians by search request: numbers")
 	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '[0-9]%')")
 	if err != nil {
 		return nil, err
@@ -96,13 +91,16 @@ func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]MusiciansWithCount,
 	result := make([]MusiciansWithCount, 0)
 	for rows.Next() {
 		var resMusician MusiciansWithCount
-		rows.Scan(&resMusician.ID, &resMusician.Name)
+		err := rows.Scan(&resMusician.ID, &resMusician.Name)
+		if err != nil {
+			return nil, err
+		}
 		result = append(result, resMusician)
 	}
 
 	var count int32
 	for _, musician := range result {
-		err := db.QueryRow("SELECT count(*) FROM books WHERE author = $1", musician.ID).Scan(&count)
+		err := db.QueryRow("SELECT count(*) FROM tabs WHERE author = $1", musician.ID).Scan(&count)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +110,6 @@ func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]MusiciansWithCount,
 }
 
 func (db *Database) getMusicians(searchString string) ([]MusiciansWithCount, error) {
-	log.Printf("DB: Getting musicians by search request: %s\n", searchString)
 	lowerSearchString := strings.ToLower(searchString)
 	rows, err := db.Query("SELECT id, name FROM musicians WHERE (lower(name) LIKE '%" + lowerSearchString + "%')")
 	if err != nil {
@@ -122,7 +119,6 @@ func (db *Database) getMusicians(searchString string) ([]MusiciansWithCount, err
 }
 
 func (db *Database) getTabsByName(searchString string) ([]TabWithSize, error) {
-	log.Printf("DB: Getting tabs with size by search request: %s\n", searchString)
 	ret := make([]TabWithSize, 0)
 	lowerSearchString := strings.ToLower(searchString)
 	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%" + lowerSearchString + "%')")
@@ -132,7 +128,7 @@ func (db *Database) getTabsByName(searchString string) ([]TabWithSize, error) {
 	for rows.Next() {
 		var tabInfo TabWithSize
 		var musicianID int32
-		rows.Scan(&musicianID, &tabInfo.Name, &tabInfo.Size)
+		_ = rows.Scan(&musicianID, &tabInfo.Name, &tabInfo.Size)
 		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", musicianID).Scan(&(tabInfo.Musician)); err != nil {
 			return nil, err
 		}
@@ -142,16 +138,14 @@ func (db *Database) getTabsByName(searchString string) ([]TabWithSize, error) {
 }
 
 func (db *Database) getMusiciansByCategory(category string) ([]MusiciansWithCount, error) {
-	log.Println("DB: Getting musicians by category search:", category)
 	ret := make([]MusiciansWithCount, 0)
 	var categoryID int32
 	err := db.QueryRow("SELECT id FROM categories WHERE (lower(name) = $1)", strings.ToLower(category)).Scan(&categoryID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return ret, nil
-		} else {
-			return nil, err
 		}
+		return nil, err
 	}
 	rows, err := db.Query("SELECT count(*) as c, author FROM tabs WHERE category = $1 GROUP BY author", categoryID)
 	if err != nil {
@@ -159,11 +153,71 @@ func (db *Database) getMusiciansByCategory(category string) ([]MusiciansWithCoun
 	}
 	for rows.Next() {
 		var tabInfo MusiciansWithCount
-		rows.Scan(&tabInfo.Count, &tabInfo.ID)
+		_ = rows.Scan(&tabInfo.Count, &tabInfo.ID)
 		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", tabInfo.ID).Scan(&(tabInfo.Name)); err != nil {
 			return nil, err
 		}
 		ret = append(ret, tabInfo)
 	}
 	return ret, nil
+}
+
+func (db *Database) getOrCreateMusician(name string) (musician, error) {
+	ret := musician{
+		Name: name,
+	}
+	err := db.QueryRow("SELECT id FROM musicians WHERE (lower(name) = $1)", strings.ToLower(name)).Scan(&ret.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = db.QueryRow("INSERT INTO musicians (name) VALUES ($1) RETURNING id", name).Scan(&ret.ID)
+			if err != nil {
+				return musician{}, err
+			}
+			return ret, nil
+		}
+		return musician{}, err
+	}
+	return ret, nil
+}
+
+func (db *Database) getOrCreateCategory(name string) (category, error) {
+	ret := category{
+		Name: name,
+	}
+	err := db.QueryRow("SELECT id FROM categories WHERE (lower(name) = $1)", strings.ToLower(name)).Scan(&ret.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = db.QueryRow("INSERT INTO categories (name) VALUES ($1) RETURNING id", name).Scan(&ret.ID)
+			if err != nil {
+				return category{}, err
+			}
+			return ret, nil
+		}
+		return category{}, err
+	}
+	return ret, nil
+}
+
+func (db *Database) createSong(musicianID, categoryID int32, name string, size int64) error {
+	var ID string
+	err := db.QueryRow("SELECT name FROM tabs WHERE author = $1 AND category = $2 AND name like '"+name+"%' order by name desc", musicianID, categoryID).Scan(&ID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	} else {
+		if ID[len(ID)-1] == ')' {
+			nameN, err := strconv.Atoi(ID[len(ID)-2 : len(ID)-1])
+			if err != nil {
+				return err
+			}
+			newNameN := strconv.Itoa(nameN + 1)
+			name = ID[:len(ID)-2] + newNameN + ")"
+		} else {
+			name = name + " (1)"
+		}
+	}
+	_, err = db.Exec("INSERT INTO tabs (author, name, category, size) VALUES ($1, $2, $3, $4)",
+		musicianID, name, categoryID, size)
+	return err
 }

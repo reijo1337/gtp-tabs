@@ -16,7 +16,7 @@ type config struct {
 
 func parseConfig(app string) (cfg config, err error) {
 	if err := envconfig.Process(app, &cfg); err != nil {
-		envconfig.Usage(app, &cfg)
+		_ = envconfig.Usage(app, &cfg)
 		return cfg, err
 	}
 	return cfg, nil

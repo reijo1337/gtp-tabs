@@ -158,11 +158,11 @@ func setUpRouter() (*gin.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
-	authorized := r.Group("/", authRequired())
-	authorized.GET("/alph/:code", ch.getAuthorsByLetter)
-	authorized.GET("/musicians/:search", ch.getAuthorsByName)
-	authorized.GET("/tabs/:search", ch.getTabsByName)
-	authorized.GET("/category/:name", ch.getMusiciansByGategory)
+	// authorized := r.Group("/", authRequired())
+	r.GET("/alph/:code", ch.getAuthorsByLetter)
+	r.GET("/musicians/:search", ch.getAuthorsByName)
+	r.GET("/tabs/:search", ch.getTabsByName)
+	r.GET("/category/:name", ch.getMusiciansByGategory)
 	// authorized.GET("/getUserArrears", getUserArrears)
 	// authorized.POST("/arrear", newArear)
 	// authorized.DELETE("/arrear", closeArrear)

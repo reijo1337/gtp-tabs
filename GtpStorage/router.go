@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"log"
 	"net/http"
 	"os"
@@ -141,19 +142,66 @@ func (s *service) GetAuthorsByCategory(c *gin.Context) {
 
 // Upload загрузка файла на сервер
 func (s *service) Upload(c *gin.Context) {
-	filename := c.GetHeader("Filename")
-	fileBody, err := c.GetRawData()
+	var req fileUploadRequest
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Println("Can't get body", err)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Can't get body",
+			},
+		)
+		return
+	}
+
+	mus, err := s.db.getOrCreateMusician(req.Musician)
+	if err != nil {
+		log.Println("Can't get musician", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't get musician",
+			},
+		)
+		return
+	}
+
+	cat, err := s.db.getOrCreateCategory(req.Category)
+	if err != nil {
+		log.Println("Can't get category", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't get category",
+			},
+		)
+		return
+	}
+
+	file, err := os.OpenFile(req.Filename, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		log.Println("Can't save file", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't save file",
+			},
+		)
+		return
+	}
+	byteContent, err := base64.StdEncoding.DecodeString(req.Content)
 	if err != nil {
 		log.Println("Can't get file", err)
 		c.JSON(
 			http.StatusBadRequest,
 			gin.H{
-				"error": "Can't get file",
+				"error": "Can't save file",
 			},
 		)
 		return
 	}
-	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0755)
+	_, err = file.Write(byteContent)
 	if err != nil {
 		log.Println("Can't save file", err)
 		c.JSON(
@@ -164,13 +212,24 @@ func (s *service) Upload(c *gin.Context) {
 		)
 		return
 	}
-	_, err = file.Write(fileBody)
+	fi, err := file.Stat()
 	if err != nil {
-		log.Println("Can't save file", err)
+		log.Println("Can't get file size", err)
 		c.JSON(
 			http.StatusInternalServerError,
 			gin.H{
-				"error": "Can't save file",
+				"error": "Can't get file size",
+			},
+		)
+		return
+	}
+	err = s.db.createSong(mus.ID, cat.ID, req.Song, fi.Size())
+	if err != nil {
+		log.Println("Can't save info about file", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't save info about file",
 			},
 		)
 		return
