@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -18,7 +17,7 @@ type StorageClientInterface interface {
 	GetAuthorsByLetter(letter string) ([]MusiciansWithCount, error)
 	GetAuthorsByName(search string) ([]MusiciansWithCount, error)
 	FindTabsByName(search string) ([]TabWithSize, error)
-	// GetAuthorsByCategory(name string) ([]*MusiciansWithCount, error)
+	GetAuthorsByCategory(name string) ([]MusiciansWithCount, error)
 }
 
 type StorageClient struct {
@@ -43,7 +42,7 @@ func (sc *StorageClient) GetAuthorsByLetter(letter string) ([]MusiciansWithCount
 
 func (sc *StorageClient) GetAuthorsByName(search string) ([]MusiciansWithCount, error) {
 	log.Println("GetAuthorsByName", search)
-	resp, err := http.Get(fmt.Sprintf("%s/musicians?search=%s", sc.url, strings.Replace(search, " ", "+", -1)))
+	resp, err := http.Get(fmt.Sprintf("%s/musicians/%s", sc.url, search))
 	if err != nil {
 		log.Println("Can't get musicians from service", err)
 		return nil, err
@@ -77,7 +76,7 @@ func (sc *StorageClient) returnMusicians(resp *http.Response) ([]MusiciansWithCo
 
 func (sc *StorageClient) FindTabsByName(search string) ([]TabWithSize, error) {
 	log.Println("GetAuthorsByName", search)
-	resp, err := http.Get(fmt.Sprintf("%s/tabs?search=%s", sc.url, strings.Replace(search, " ", "+", -1)))
+	resp, err := http.Get(fmt.Sprintf("%s/tabs/%s", sc.url, search))
 	if err != nil {
 		log.Println("Can't get musicians from service", err)
 		return nil, err
@@ -103,4 +102,14 @@ func (sc *StorageClient) FindTabsByName(search string) ([]TabWithSize, error) {
 		return nil, err
 	}
 	return ret, nil
+}
+
+func (sc *StorageClient) GetAuthorsByCategory(name string) ([]MusiciansWithCount, error) {
+	log.Println("GetAuthorsByName", name)
+	resp, err := http.Get(fmt.Sprintf("%s/category/%s", sc.url, name))
+	if err != nil {
+		log.Println("Can't get musicians from service", err)
+		return nil, err
+	}
+	return sc.returnMusicians(resp)
 }

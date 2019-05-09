@@ -125,7 +125,7 @@ func (db *Database) getTabsByName(searchString string) ([]TabWithSize, error) {
 	log.Printf("DB: Getting tabs with size by search request: %s\n", searchString)
 	ret := make([]TabWithSize, 0)
 	lowerSearchString := strings.ToLower(searchString)
-	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%"+ lowerSearchString+"%')")
+	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%" + lowerSearchString + "%')")
 	if err != nil {
 		return nil, err
 	}
@@ -145,11 +145,15 @@ func (db *Database) getMusiciansByCategory(category string) ([]MusiciansWithCoun
 	log.Println("DB: Getting musicians by category search:", category)
 	ret := make([]MusiciansWithCount, 0)
 	var categoryID int32
-	err := db.QueryRow("SELECT id FROM categories WHERE (lower(name) = %1)", strings.ToLower(category)).Scan(&categoryID)
+	err := db.QueryRow("SELECT id FROM categories WHERE (lower(name) = $1)", strings.ToLower(category)).Scan(&categoryID)
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return ret, nil
+		} else {
+			return nil, err
+		}
 	}
-	rows, err := db.Query("SELECT count(*) as c, author FROM tabs WHERE category = %1 GROUP BY author", categoryID)
+	rows, err := db.Query("SELECT count(*) as c, author FROM tabs WHERE category = $1 GROUP BY author", categoryID)
 	if err != nil {
 		return nil, err
 	}

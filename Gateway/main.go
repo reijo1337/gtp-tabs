@@ -81,7 +81,7 @@ func (ch *clientHolder) getAuthorsByLetter(c *gin.Context) {
 }
 
 func (ch *clientHolder) getAuthorsByName(c *gin.Context) {
-	search := c.Query("search")
+	search := c.Param("search")
 	if search == "" {
 		c.JSON(
 			http.StatusBadRequest,
@@ -105,7 +105,7 @@ func (ch *clientHolder) getAuthorsByName(c *gin.Context) {
 }
 
 func (ch *clientHolder) getTabsByName(c *gin.Context) {
-	search := c.Query("search")
+	search := c.Param("search")
 	if search == "" {
 		c.JSON(
 			http.StatusBadRequest,
@@ -128,6 +128,30 @@ func (ch *clientHolder) getTabsByName(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+func (ch *clientHolder) getMusiciansByGategory(c *gin.Context) {
+	name := c.Param("name")
+	if name == "" {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "category name required",
+			},
+		)
+		return
+	}
+	result, err := ch.storage.GetAuthorsByCategory(name)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
 func setUpRouter() (*gin.Engine, error) {
 	r := gin.Default()
 	ch, err := setUpClientHolder()
@@ -136,8 +160,9 @@ func setUpRouter() (*gin.Engine, error) {
 	}
 	authorized := r.Group("/", authRequired())
 	authorized.GET("/alph/:code", ch.getAuthorsByLetter)
-	authorized.GET("/musicians", ch.getAuthorsByName)
-	authorized.GET("/tabs", ch.getTabsByName)
+	authorized.GET("/musicians/:search", ch.getAuthorsByName)
+	authorized.GET("/tabs/:search", ch.getTabsByName)
+	authorized.GET("/category/:name", ch.getMusiciansByGategory)
 	// authorized.GET("/getUserArrears", getUserArrears)
 	// authorized.POST("/arrear", newArear)
 	// authorized.DELETE("/arrear", closeArrear)
