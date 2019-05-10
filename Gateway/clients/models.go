@@ -1,5 +1,7 @@
 package clients
 
+import "io"
+
 // MusiciansWithCount пресдтавление инфорамии об авторах и количеству табулатур
 type MusiciansWithCount struct {
 	ID    int32  `json:"id"`
@@ -17,4 +19,11 @@ type TabWithSize struct {
 // ErrorResponse если результат прошел неудачно
 type ErrorResponse struct {
 	Error string `json:"error"`
+}
+
+type FileDownloadResponse struct {
+	FileContent   io.Reader
+	ContentLength int64
+	ContentType   string
+	ExtraHeaders  map[string]string
 }

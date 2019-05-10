@@ -244,7 +244,7 @@ func (s *service) Upload(c *gin.Context) {
 
 // Download скачивание файла
 func (s *service) Download(c *gin.Context) {
-	filename := c.GetHeader("Filename")
+	filename := c.Query("name")
 	f, err := os.Open(filepath.Join(filename))
 	if err != nil {
 		log.Println("Can't send file", filename, err)

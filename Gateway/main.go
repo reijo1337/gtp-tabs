@@ -166,6 +166,20 @@ func (ch *clientHolder) uploadFile(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func (ch *clientHolder) downloadFile(c *gin.Context) {
+	ret, err := ch.storage.DownloadFile(c.Query("name"))
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+	c.DataFromReader(http.StatusOK, ret.ContentLength, ret.ContentType, ret.FileContent, ret.ExtraHeaders)
+}
+
 func setUpRouter() (*gin.Engine, error) {
 	r := gin.Default()
 	ch, err := setUpClientHolder()
@@ -174,10 +188,12 @@ func setUpRouter() (*gin.Engine, error) {
 	}
 	authorized := r.Group("/", authRequired())
 	authorized.PUT("/", ch.uploadFile)
+
 	r.GET("/alph/:code", ch.getAuthorsByLetter)
 	r.GET("/musicians/:search", ch.getAuthorsByName)
 	r.GET("/tabs/:search", ch.getTabsByName)
 	r.GET("/category/:name", ch.getMusiciansByGategory)
+	r.GET("/file", ch.downloadFile)
 	// authorized.GET("/getUserArrears", getUserArrears)
 	// authorized.POST("/arrear", newArear)
 	// authorized.DELETE("/arrear", closeArrear)

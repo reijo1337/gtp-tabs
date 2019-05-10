@@ -20,6 +20,7 @@ type StorageClientInterface interface {
 	FindTabsByName(search string) ([]TabWithSize, error)
 	GetAuthorsByCategory(name string) ([]MusiciansWithCount, error)
 	UploadFile(reader io.Reader) error
+	DownloadFile(name string) (FileDownloadResponse, error)
 }
 
 type StorageClient struct {
@@ -138,4 +139,20 @@ func (sc *StorageClient) UploadFile(reader io.Reader) error {
 		return errors.New(errResp.Error)
 	}
 	return nil
+}
+
+func (sc *StorageClient) DownloadFile(name string) (FileDownloadResponse, error) {
+	resp, err := http.Get(fmt.Sprintf("%s/file?name=%s", sc.url, name))
+	if err != nil {
+		log.Println("Can't get file from service", err)
+		return FileDownloadResponse{}, err
+	}
+	var ret FileDownloadResponse
+	ret.FileContent = resp.Body
+	ret.ContentLength = resp.ContentLength
+	ret.ContentType = resp.Header.Get("Content-Type")
+	ret.ExtraHeaders = map[string]string{
+		"Content-Disposition": resp.Header.Get("Content-Disposition"),
+	}
+	return ret, nil
 }
