@@ -200,7 +200,7 @@ func (db *Database) getOrCreateCategory(name string) (category, error) {
 
 func (db *Database) createSong(musicianID, categoryID int32, name string, size int64) error {
 	var ID string
-	err := db.QueryRow("SELECT name FROM tabs WHERE author = $1 AND category = $2 AND name like '"+name+"%' order by name desc", musicianID, categoryID).Scan(&ID)
+	err := db.QueryRow("SELECT name FROM tabs WHERE author = $1 AND category = $2 AND name LIKE '"+name+"%' ORDER BY name DESC LIMIT 1", musicianID, categoryID).Scan(&ID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return err

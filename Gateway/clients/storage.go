@@ -3,6 +3,7 @@ package clients
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,6 +19,7 @@ type StorageClientInterface interface {
 	GetAuthorsByName(search string) ([]MusiciansWithCount, error)
 	FindTabsByName(search string) ([]TabWithSize, error)
 	GetAuthorsByCategory(name string) ([]MusiciansWithCount, error)
+	UploadFile(reader io.Reader) error
 }
 
 type StorageClient struct {
@@ -112,4 +114,28 @@ func (sc *StorageClient) GetAuthorsByCategory(name string) ([]MusiciansWithCount
 		return nil, err
 	}
 	return sc.returnMusicians(resp)
+}
+
+func (sc *StorageClient) UploadFile(reader io.Reader) error {
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/file", sc.url), reader)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(resp.Body)
+		errResp := ErrorResponse{}
+		err = json.Unmarshal(body, &errResp)
+		if err != nil {
+			return err
+		}
+		return errors.New(errResp.Error)
+	}
+	return nil
 }

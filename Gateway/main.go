@@ -152,13 +152,28 @@ func (ch *clientHolder) getMusiciansByGategory(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+func (ch *clientHolder) uploadFile(c *gin.Context) {
+	err := ch.storage.UploadFile(c.Request.Body)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
 func setUpRouter() (*gin.Engine, error) {
 	r := gin.Default()
 	ch, err := setUpClientHolder()
 	if err != nil {
 		return nil, err
 	}
-	// authorized := r.Group("/", authRequired())
+	authorized := r.Group("/", authRequired())
+	authorized.PUT("/", ch.uploadFile)
 	r.GET("/alph/:code", ch.getAuthorsByLetter)
 	r.GET("/musicians/:search", ch.getAuthorsByName)
 	r.GET("/tabs/:search", ch.getTabsByName)
