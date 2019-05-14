@@ -137,3 +137,11 @@ func (db *Database) isAuthorizedVK(user *vkUser) bool {
 	}
 	return true
 }
+
+func (db *Database) credentialsInUse(user *user) bool {
+	err := db.QueryRow("SELECT id FROM users WHERE login = $1", user.Login).Scan(&(user.ID))
+	if err != nil {
+		return false
+	}
+	return true
+}

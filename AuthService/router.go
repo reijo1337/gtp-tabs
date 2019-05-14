@@ -31,6 +31,7 @@ func SetUpRouter() (*gin.Engine, error) {
 		return nil, err
 	}
 	r.POST("/", s.getToken)
+	r.POST("/vk", s.getTokenVK)
 	r.GET("/", s.refreshToken)
 	return r, nil
 }
@@ -195,4 +196,54 @@ func genToken(login string) (*tokens, error) {
 		AccessToken:  accessTokenString,
 		RefreshToken: refreshTokenString,
 	}, nil
+}
+
+func (s *service) register(c *gin.Context) {
+	log.Println("Server: request for registration for local user")
+	req := &user{}
+	if err := c.BindJSON(req); err != nil {
+		log.Println("Server: Can't parse request body:", err.Error())
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Пробелмы с обработкой запроса",
+			},
+		)
+		return
+	}
+	log.Println("Server: Checking login ", req.Login)
+	if s.db.credentialsInUse(req) {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Пользователь с таким логином уже существует",
+			},
+		)
+		return
+	}
+	_, err := s.db.insertNewUser(req.Login, req.Password, req.Role.Name)
+	if err != nil {
+		log.Println("Server: can't regiser user", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Не удалось зарегистрировать пользователя",
+			},
+		)
+	}
+	token, err := genToken(req.Login)
+	if err != nil {
+		log.Println("Server: Can't authorize this user: ", err.Error())
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Неудачная авторизация",
+			},
+		)
+		return
+	}
+	c.JSON(
+		http.StatusOK,
+		token,
+	)
 }
