@@ -53,7 +53,6 @@ func createSchema(db *sql.DB) error {
 			id SERIAL NOT NULL PRIMARY KEY,
 			login VARCHAR(20) UNIQUE NOT NULL,
 			passhash VARCHAR(70) NOT NULL,
-			uuid UUID NOT NULL,
 			role INT NOT NULL
 		)`); err != nil {
 		return err
@@ -62,8 +61,7 @@ func createSchema(db *sql.DB) error {
 		CREATE TABLE IF NOT EXISTS vk_users (
 			id SERIAL NOT NULL PRIMARY KEY,
 			vk_id BIGINT NOT NULL,
-			role INT NOT NULL,
-			uuid UUID NOT NULL
+			role INT NOT NULL
 		)`); err != nil {
 		return err
 	}
@@ -144,4 +142,24 @@ func (db *Database) credentialsInUse(user *user) bool {
 		return false
 	}
 	return true
+}
+
+func (db *Database) insertNewVkUser(userID int64, role string) (*vkUser, error) {
+	var roleID int32
+	var ID int64
+	err := db.QueryRow("SELECT id FROM roles WHERE name = $1", role).Scan(&roleID)
+	if err != nil {
+		return nil, err
+	}
+	if err := db.QueryRow("INSERT INTO vk_users (vk_id, role) VALUES ($1, $2) RETURNING id", userID, roleID).Scan(&ID); err != nil {
+		return nil, err
+	}
+	return &vkUser{
+		ID:     ID,
+		UserID: userID,
+		Role: Role{
+			ID:   roleID,
+			Name: role,
+		},
+	}, nil
 }

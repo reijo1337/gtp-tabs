@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -94,7 +95,7 @@ func (s *service) getTokenVK(c *gin.Context) {
 
 	log.Println("Server: Checking login ", req.UserID)
 	if s.db.isAuthorizedVK(req) {
-		token, err := genToken(string(req.UserID))
+		token, err := genToken(strconv.FormatInt(req.UserID, 10))
 		if err != nil {
 			log.Println("Server: Can't authorize this user: ", err.Error())
 			c.JSON(
@@ -232,6 +233,56 @@ func (s *service) register(c *gin.Context) {
 		)
 	}
 	token, err := genToken(req.Login)
+	if err != nil {
+		log.Println("Server: Can't authorize this user: ", err.Error())
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Неудачная авторизация",
+			},
+		)
+		return
+	}
+	c.JSON(
+		http.StatusOK,
+		token,
+	)
+}
+
+func (s *service) registerVk(c *gin.Context) {
+	log.Println("Server: request for registration for vk user")
+	req := &vkUser{}
+	if err := c.BindJSON(req); err != nil {
+		log.Println("Server: Can't parse request body:", err.Error())
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Пробелмы с обработкой запроса",
+			},
+		)
+		return
+	}
+	log.Println("Server: Checking login ", req.UserID)
+	if s.db.isAuthorizedVK(req) {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Пользователь с таким логином уже существует",
+			},
+		)
+		return
+	}
+	_, err := s.db.insertNewVkUser(req.UserID, req.Role.Name)
+	if err != nil {
+		log.Println("Server: can't regiser user", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Не удалось зарегистрировать пользователя",
+			},
+		)
+	}
+	token, err := genToken(strconv.FormatInt(req.UserID, 10))
 	if err != nil {
 		log.Println("Server: Can't authorize this user: ", err.Error())
 		c.JSON(

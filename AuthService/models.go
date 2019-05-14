@@ -13,8 +13,8 @@ type user struct {
 }
 
 type vkUser struct {
-	ID     int32
-	UserID int32 `json:"user_id"`
+	ID     int64
+	UserID int64 `json:"user_id"`
 	Role   Role  `json:"role"`
 }
 
