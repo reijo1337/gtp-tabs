@@ -12,6 +12,12 @@ type user struct {
 	Role     Role   `json:"role"`
 }
 
+type vkUser struct {
+	ID     int32
+	UserID int32 `json:"user_id"`
+	Role   Role  `json:"role"`
+}
+
 type tokens struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`

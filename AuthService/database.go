@@ -53,7 +53,17 @@ func createSchema(db *sql.DB) error {
 			id SERIAL NOT NULL PRIMARY KEY,
 			login VARCHAR(20) UNIQUE NOT NULL,
 			passhash VARCHAR(70) NOT NULL,
+			uuid UUID NOT NULL,
 			role INT NOT NULL
+		)`); err != nil {
+		return err
+	}
+	if _, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS vk_users (
+			id SERIAL NOT NULL PRIMARY KEY,
+			vk_id BIGINT NOT NULL,
+			role INT NOT NULL,
+			uuid UUID NOT NULL
 		)`); err != nil {
 		return err
 	}
@@ -115,4 +125,15 @@ func (db *Database) isAuthorized(user *user) bool {
 	pass := passHash.Sum(nil)
 	passStr := fmt.Sprintf("%x\n", pass)
 	return passhash == passStr
+}
+
+func (db *Database) isAuthorizedVK(user *vkUser) bool {
+	var ID int64
+	log.Println("DB: Check user is in DB")
+	err := db.QueryRow("SELECT id FROM vk_users WHERE vk_id = $1", user.UserID).Scan(
+		&ID)
+	if err != nil {
+		return false
+	}
+	return true
 }

@@ -11,7 +11,8 @@ type config struct {
 		Host     string `default:"127.0.0.1" envconfig:"DB_HOST"`
 		Name     string `default:"auth" envconfig:"DB_NAME"`
 	}
-	Port string `default:"8081"`
+	PublicColFile string
+	Port          string `default:"8081"`
 }
 
 func parseConfig(app string) (cfg config, err error) {

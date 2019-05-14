@@ -36,7 +36,7 @@ func SetUpRouter() (*gin.Engine, error) {
 }
 
 func (s *service) getToken(c *gin.Context) {
-	log.Println("Server: request for new token")
+	log.Println("Server: request for new token for local user")
 	req := &user{}
 	if err := c.BindJSON(req); err != nil {
 		log.Println("Server: Can't parse request body:", err.Error())
@@ -75,7 +75,48 @@ func (s *service) getToken(c *gin.Context) {
 		)
 		return
 	}
+}
 
+func (s *service) getTokenVK(c *gin.Context) {
+	log.Println("Server: request for new token for vk user")
+	req := &vkUser{}
+	if err := c.BindJSON(req); err != nil {
+		log.Println("Server: Can't parse request body:", err.Error())
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "Пробелмы с обработкой запроса",
+			},
+		)
+		return
+	}
+
+	log.Println("Server: Checking login ", req.UserID)
+	if s.db.isAuthorizedVK(req) {
+		token, err := genToken(string(req.UserID))
+		if err != nil {
+			log.Println("Server: Can't authorize this user: ", err.Error())
+			c.JSON(
+				http.StatusUnauthorized,
+				gin.H{
+					"error": "Неудачная авторизация",
+				},
+			)
+			return
+		}
+		c.JSON(
+			http.StatusOK,
+			token,
+		)
+	} else {
+		c.JSON(
+			http.StatusUnauthorized,
+			gin.H{
+				"error": "Неудачная авторизация",
+			},
+		)
+		return
+	}
 }
 
 func (s *service) refreshToken(c *gin.Context) {
