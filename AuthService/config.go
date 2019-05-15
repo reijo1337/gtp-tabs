@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -11,8 +13,12 @@ type config struct {
 		Host     string `default:"127.0.0.1" envconfig:"DB_HOST"`
 		Name     string `default:"auth" envconfig:"DB_NAME"`
 	}
-	PublicColFile string
-	Port          string `default:"8081"`
+	Token struct {
+		PrivateKey        string        `default:"keys/private.pem" envconfig:"PRIVATE_KEY"`
+		AccessExpiration  time.Duration `default:"30m" envconfig:"TOKEN_ACCESS_EXPIRATION"`
+		RefreshExpiration time.Duration `default:"300m" envconfig:"TOKEN_REFRESH_EXPIRATION"`
+	}
+	Port string `default:"8081"`
 }
 
 func parseConfig(app string) (cfg config, err error) {

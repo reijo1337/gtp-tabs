@@ -10,6 +10,7 @@ type config struct {
 		Host string `default:"127.0.0.1" envconfig:"STORAGE_HOST"`
 		Port string `default:"8081" envconfig:"STORAGE_PORT"`
 	}
+	PublicKeyLoc string `envconfig:"PUBLIC_KEY_LOC"`
 }
 
 func parseConfig(app string) (cfg config, err error) {

@@ -10,7 +10,7 @@ func main() {
 	if err != nil {
 		log.Panicln("Can't read config:", err)
 	}
-	r, err := SetUpRouter()
+	r, err := SetUpRouter(config.Token.PrivateKey, config.Token.AccessExpiration, config.Token.RefreshExpiration)
 	if err != nil {
 		log.Panicln("Can't set up server:", err)
 	}
