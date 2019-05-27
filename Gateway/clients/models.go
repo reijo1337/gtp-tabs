@@ -27,3 +27,26 @@ type FileDownloadResponse struct {
 	ContentType   string
 	ExtraHeaders  map[string]string
 }
+
+type Role struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+}
+
+type User struct {
+	ID       int32
+	Login    string `json:"login"`
+	Password string `json:"password"`
+	Role     Role   `json:"role"`
+}
+
+type VkUser struct {
+	ID     int64
+	UserID int64 `json:"user_id"`
+	Role   Role  `json:"role"`
+}
+
+type Tokens struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
