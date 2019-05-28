@@ -88,8 +88,8 @@ func (s *service) getToken(c *gin.Context) {
 		c.JSON(
 			http.StatusOK,
 			loginResponse{
-				userID: req.ID,
-				tokens: *token,
+				UserID: req.ID,
+				Tokens: *token,
 			},
 		)
 	} else {
@@ -133,8 +133,8 @@ func (s *service) getTokenVK(c *gin.Context) {
 		c.JSON(
 			http.StatusOK,
 			loginResponse{
-				userID: req.ID,
-				tokens: *token,
+				UserID: req.ID,
+				Tokens: *token,
 			},
 		)
 	} else {
