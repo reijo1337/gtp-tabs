@@ -113,8 +113,8 @@ func (db *Database) isAuthorized(user *user) bool {
 		passhash string
 	)
 
-	err := db.QueryRow("SELECT passhash FROM users WHERE login = $1", user.Login).Scan(
-		&passhash)
+	err := db.QueryRow("SELECT passhash, id FROM users WHERE login = $1", user.Login).Scan(
+		&passhash, &(user.ID))
 	if err != nil {
 		return false
 	}
@@ -126,10 +126,9 @@ func (db *Database) isAuthorized(user *user) bool {
 }
 
 func (db *Database) isAuthorizedVK(user *vkUser) bool {
-	var ID int64
 	log.Println("DB: Check user is in DB")
 	err := db.QueryRow("SELECT id FROM vk_users WHERE vk_id = $1", user.UserID).Scan(
-		&ID)
+		&(user.ID))
 	if err != nil {
 		return false
 	}
@@ -146,7 +145,7 @@ func (db *Database) credentialsInUse(user *user) bool {
 
 func (db *Database) insertNewVkUser(userID int64, role string) (*vkUser, error) {
 	var roleID int32
-	var ID int64
+	var ID int32
 	err := db.QueryRow("SELECT id FROM roles WHERE name = $1", role).Scan(&roleID)
 	if err != nil {
 		return nil, err

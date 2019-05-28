@@ -28,6 +28,7 @@ func setUpRouter() (*gin.Engine, error) {
 		return nil, fmt.Errorf("make service: %v", err)
 	}
 	r.GET("/profile/:id", s.getProfile)
+	r.GET("/profile/user/:id", s.getProfileByAccount)
 	r.POST("/profile", s.setNewProfile)
 	return r, nil
 }
@@ -69,4 +70,27 @@ func (s *service) setNewProfile(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, newUser)
+}
+
+func (s *service) getProfileByAccount(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Println("Can't get user id:", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+		return
+	}
+	user, err := s.db.getProfileByUser(userID)
+	if err != nil {
+		log.Printf("getting user: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get user"})
+		return
+	}
+	instruments, err := s.db.getInstruments(user.ID)
+	if err != nil {
+		log.Printf("getting instruments: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get instruments"})
+		return
+	}
+	user.Instruments = instruments
+	c.JSON(http.StatusOK, user)
 }

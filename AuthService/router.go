@@ -87,7 +87,10 @@ func (s *service) getToken(c *gin.Context) {
 		}
 		c.JSON(
 			http.StatusOK,
-			token,
+			loginResponse{
+				userID: req.ID,
+				tokens: *token,
+			},
 		)
 	} else {
 		c.JSON(
@@ -129,7 +132,10 @@ func (s *service) getTokenVK(c *gin.Context) {
 		}
 		c.JSON(
 			http.StatusOK,
-			token,
+			loginResponse{
+				userID: req.ID,
+				tokens: *token,
+			},
 		)
 	} else {
 		c.JSON(
@@ -236,7 +242,7 @@ func (s *service) register(c *gin.Context) {
 		)
 		return
 	}
-	_, err := s.db.insertNewUser(req.Login, req.Password, req.Role.Name)
+	newUser, err := s.db.insertNewUser(req.Login, req.Password, req.Role.Name)
 	if err != nil {
 		log.Println("Server: can't regiser user", err)
 		c.JSON(
@@ -259,7 +265,10 @@ func (s *service) register(c *gin.Context) {
 	}
 	c.JSON(
 		http.StatusOK,
-		token,
+		gin.H{
+			"user":  *newUser,
+			"token": token,
+		},
 	)
 }
 
@@ -286,7 +295,7 @@ func (s *service) registerVk(c *gin.Context) {
 		)
 		return
 	}
-	_, err := s.db.insertNewVkUser(req.UserID, req.Role.Name)
+	newUser, err := s.db.insertNewVkUser(req.UserID, req.Role.Name)
 	if err != nil {
 		log.Println("Server: can't regiser user", err)
 		c.JSON(
@@ -309,6 +318,9 @@ func (s *service) registerVk(c *gin.Context) {
 	}
 	c.JSON(
 		http.StatusOK,
-		token,
+		gin.H{
+			"user":  *newUser,
+			"token": token,
+		},
 	)
 }

@@ -32,19 +32,19 @@ type FileDownloadResponse struct {
 }
 
 type Role struct {
-	ID   int32  `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
 type User struct {
-	ID       int32
+	ID       int
 	Login    string `json:"login"`
 	Password string `json:"password"`
 	Role     Role   `json:"role"`
 }
 
 type VkUser struct {
-	ID     int64
+	ID     int
 	UserID int64 `json:"user_id"`
 	Role   Role  `json:"role"`
 }
@@ -66,4 +66,26 @@ type ProfileInfo struct {
 type Instrument struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+type RegisterResponse struct {
+	Profile ProfileInfo `json:"profile"`
+	User    User        `json:"user"`
+	Tokens  Tokens      `json:"tokens"`
+}
+
+type RegisterVkResponse struct {
+	Profile ProfileInfo `json:"profile"`
+	User    VkUser      `json:"user"`
+	Tokens  Tokens      `json:"tokens"`
+}
+
+type LoginResponse struct {
+	ProfileID int    `json:"profile_id"`
+	Tokens    Tokens `json:"tokens"`
+}
+
+type LoginWithUserResponse struct {
+	UserID int    `json:"user_id"`
+	Tokens Tokens `json:"tokens"`
 }

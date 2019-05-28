@@ -118,3 +118,12 @@ func (db *database) setNewUserInstruments(user userInfo) error {
 	}
 	return nil
 }
+
+func (db *database) getProfileByUser(userID int) (userInfo, error) {
+	var user userInfo
+	if err := db.QueryRow("select * from user_info where account_id = $1", userID).Scan(&user.ID, &user.AccountID,
+		&user.Name, &user.Registered, &user.Birthday); err != nil {
+		return userInfo{}, fmt.Errorf("getting user by id: %v", err)
+	}
+	return user, nil
+}

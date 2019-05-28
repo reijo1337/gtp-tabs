@@ -13,7 +13,7 @@ type user struct {
 }
 
 type vkUser struct {
-	ID     int64
+	ID     int32
 	UserID int64 `json:"user_id"`
 	Role   Role  `json:"role"`
 }
@@ -21,4 +21,9 @@ type vkUser struct {
 type tokens struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+}
+
+type loginResponse struct {
+	UserID int32  `json:"user_id"`
+	Tokens tokens `json:"tokens"`
 }

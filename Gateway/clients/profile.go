@@ -10,6 +10,7 @@ import (
 // ProfileClientInterface -
 type ProfileClientInterface interface {
 	GetProfile(userID int) (*ProfileInfo, error)
+	GetProfileByAcc(userID int) (*ProfileInfo, error)
 	SetProfile(user *ProfileInfo) error
 }
 
@@ -23,6 +24,30 @@ func MakeProfileClient(host string, port string) ProfileClientInterface {
 	return &ProfileClient{
 		url: fmt.Sprintf("http://%s:%s", host, port),
 	}
+}
+
+func (pc *ProfileClient) GetProfileByAcc(userID int) (*ProfileInfo, error) {
+	url := fmt.Sprintf("%s/profile/user/%d", pc.url, userID)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("send refresh request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("reading response: %v", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		errMsg := &ErrorResponse{}
+		json.Unmarshal(body, errMsg)
+		return nil, fmt.Errorf("status not ok: %s", errMsg.Error)
+	}
+	pi := &ProfileInfo{}
+	if err = json.Unmarshal(body, pi); err != nil {
+		return nil, fmt.Errorf("parsing response: %v", err)
+	}
+	return pi, nil
 }
 
 func (pc *ProfileClient) GetProfile(userID int) (*ProfileInfo, error) {
