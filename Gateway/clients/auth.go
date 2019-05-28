@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// AuthClientInterface -
 type AuthClientInterface interface {
 	Register(user *User) (*Tokens, error)
 	RegisterVk(user *VkUser) (*Tokens, error)
@@ -15,10 +16,12 @@ type AuthClientInterface interface {
 	RefreshToken(refreshToken string) (*Tokens, error)
 }
 
+// AuthClient -
 type AuthClient struct {
 	url string
 }
 
+// MakeAuthClient -
 func MakeAuthClient(host string, port string) AuthClientInterface {
 	return &AuthClient{
 		url: fmt.Sprintf("http://%s:%s", host, port),
@@ -28,7 +31,7 @@ func MakeAuthClient(host string, port string) AuthClientInterface {
 func (ac *AuthClient) Register(user *User) (*Tokens, error) {
 	jsonStr, err := json.Marshal(user)
 	if err != nil {
-		return nil, fmt.Errorf("parsing user: %v")
+		return nil, fmt.Errorf("parsing user: %v", err)
 	}
 	url := fmt.Sprintf("%s/register", ac.url)
 	return ac.registerRequest(jsonStr, url)
@@ -37,7 +40,7 @@ func (ac *AuthClient) Register(user *User) (*Tokens, error) {
 func (ac *AuthClient) RegisterVk(user *VkUser) (*Tokens, error) {
 	jsonStr, err := json.Marshal(user)
 	if err != nil {
-		return nil, fmt.Errorf("parsing user: %v")
+		return nil, fmt.Errorf("parsing user: %v", err)
 	}
 	url := fmt.Sprintf("%s/register/vk", ac.url)
 	return ac.registerRequest(jsonStr, url)
@@ -71,7 +74,7 @@ func (ac *AuthClient) registerRequest(jsonStr []byte, url string) (*Tokens, erro
 func (ac *AuthClient) GenToken(user *User) (*Tokens, error) {
 	jsonStr, err := json.Marshal(user)
 	if err != nil {
-		return nil, fmt.Errorf("parsing user: %v")
+		return nil, fmt.Errorf("parsing user: %v", err)
 	}
 	return ac.registerRequest(jsonStr, ac.url)
 }
@@ -79,7 +82,7 @@ func (ac *AuthClient) GenToken(user *User) (*Tokens, error) {
 func (ac *AuthClient) GenTokenVk(user *VkUser) (*Tokens, error) {
 	jsonStr, err := json.Marshal(user)
 	if err != nil {
-		return nil, fmt.Errorf("parsing user: %v")
+		return nil, fmt.Errorf("parsing user: %v", err)
 	}
 	url := fmt.Sprintf("%s/vk", ac.url)
 	return ac.registerRequest(jsonStr, url)

@@ -1,6 +1,9 @@
 package clients
 
-import "io"
+import (
+	"io"
+	"time"
+)
 
 // MusiciansWithCount пресдтавление инфорамии об авторах и количеству табулатур
 type MusiciansWithCount struct {
@@ -49,4 +52,18 @@ type VkUser struct {
 type Tokens struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+}
+
+type ProfileInfo struct {
+	ID          int          `json:"id"`
+	AccountID   int          `json:"account_id"`
+	Name        string       `json:"name"`
+	Registered  time.Time    `json:"registered"`
+	Birthday    time.Time    `json:"birhday"`
+	Instruments []Instrument `json:"instruments"`
+}
+
+type Instrument struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }

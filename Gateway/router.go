@@ -11,6 +11,7 @@ import (
 type clientHolder struct {
 	storage clients.StorageClientInterface
 	auth    clients.AuthClientInterface
+	profile clients.ProfileClientInterface
 }
 
 func setUpClientHolder() (*clientHolder, error) {
@@ -22,6 +23,7 @@ func setUpClientHolder() (*clientHolder, error) {
 	return &clientHolder{
 		storage: clients.MakeStorageClient(config.Storage.Host, config.Storage.Port),
 		auth:    clients.MakeAuthClient(config.Storage.Host, config.Storage.Port),
+		profile: clients.MakeProfileClient(config.Storage.Host, config.Storage.Port),
 	}, nil
 }
 

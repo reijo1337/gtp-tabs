@@ -68,5 +68,5 @@ func (s *service) setNewProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Can't save user"})
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, newUser)
 }
