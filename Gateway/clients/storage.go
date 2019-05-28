@@ -118,7 +118,7 @@ func (sc *StorageClient) GetAuthorsByCategory(name string) ([]MusiciansWithCount
 }
 
 func (sc *StorageClient) UploadFile(reader io.Reader) error {
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/file", sc.url), reader)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/file", sc.url), reader)
 	if err != nil {
 		return err
 	}

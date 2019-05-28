@@ -89,3 +89,23 @@ type LoginWithUserResponse struct {
 	UserID int    `json:"user_id"`
 	Tokens Tokens `json:"tokens"`
 }
+
+type Post struct {
+	ID       int       `json:"id"`
+	SongName string    `json:"song_name"`
+	TabID    int       `json:"tab_id"`
+	AuthorID int       `json:"author_id"`
+	Rating   float32   `json:"rating"`
+	Comments []Comment `json:"comments"`
+}
+
+type Comment struct {
+	ID       int    `json:"id"`
+	AuthorID int    `json:"author_id"`
+	Content  string `json:"content"`
+}
+
+type UpdateRatingRequest struct {
+	PostID int `json:"post_id"`
+	Rating int `json:"rating"`
+}

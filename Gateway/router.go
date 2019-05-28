@@ -9,6 +9,7 @@ type clientHolder struct {
 	storage clients.StorageClientInterface
 	auth    clients.AuthClientInterface
 	profile clients.ProfileClientInterface
+	post    clients.PostClientInterface
 }
 
 func setUpClientHolder() (*clientHolder, error) {
@@ -35,7 +36,7 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 		return nil, err
 	}
 	authorized := r.Group("/", auth.verifyToken())
-	authorized.PUT("/", ch.uploadFile)
+	authorized.POST("/file", ch.uploadFile)
 	authorized.GET("/profile/:id", ch.getProfile)
 
 	r.GET("/alph/:code", ch.getAuthorsByLetter)

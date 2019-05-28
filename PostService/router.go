@@ -77,6 +77,7 @@ func (s *service) updateRating(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't update rating"})
 		return
 	}
+	c.Status(http.StatusOK)
 }
 
 func (s *service) makeComment(c *gin.Context) {
