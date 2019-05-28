@@ -11,26 +11,20 @@ addons:
   postgresql: "9.6"
 script:
   - cd AuthService
-  - make deps
   - make build
   - cd ..
   - cd FeedbackService
-  - make deps
   - make build
   - cd ..
   - cd Gateway
-  - make deps
   - make build
   - cd ..
   - cd GtpStorage
-  - make deps
   - make build
   - cd ..
   - cd PostService
-  - make deps
   - make build
   - cd ..
   - cd ProfileService
-  - make deps
   - make build
   - cd ..
