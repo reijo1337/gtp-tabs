@@ -2,6 +2,9 @@ language: go
 go:
 - '1.11'
 sudo: true
+branches:
+  only:
+  - master
 services:
   - postgresql
 addons:
