@@ -1,6 +1,5 @@
 deps:
-	go get -u ./...
-	go mod tidy
+	go test ./...
 	go mod vendor
 
 test:
