@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gtp-tabs/Gateway/clients"
@@ -151,7 +152,7 @@ func (ch *clientHolder) getToken(c *gin.Context) {
 	}
 	res, err := ch.auth.GenToken(&user)
 	if err != nil {
-		log.Println("getting tokens: %v", err)
+		log.Printf("getting tokens: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get token"})
 		return
 	}
@@ -167,7 +168,7 @@ func (ch *clientHolder) getTokenVK(c *gin.Context) {
 	}
 	res, err := ch.auth.GenTokenVk(&user)
 	if err != nil {
-		log.Println("getting tokens: %v", err)
+		log.Printf("getting tokens: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get token"})
 		return
 	}
@@ -195,7 +196,7 @@ func (ch *clientHolder) register(c *gin.Context) {
 	}
 	res, err := ch.auth.Register(&user)
 	if err != nil {
-		log.Println("getting tokens: %v", err)
+		log.Printf("getting tokens: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get token"})
 		return
 	}
@@ -211,11 +212,27 @@ func (ch *clientHolder) registerVk(c *gin.Context) {
 	}
 	res, err := ch.auth.RegisterVk(&user)
 	if err != nil {
-		log.Println("getting tokens: %v", err)
+		log.Printf("getting tokens: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't get token"})
 		return
 	}
 	c.JSON(http.StatusOK, res)
+}
+
+func (ch *clientHolder) getUser(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("parsing user id: %v", err)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	userProfile, err := ch.profile.GetProfile(userID)
+	if err != nil {
+		log.Printf("getting user profile: %v", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, userProfile)
 }
 
 func setUpRouter(publicKey []byte) (*gin.Engine, error) {
