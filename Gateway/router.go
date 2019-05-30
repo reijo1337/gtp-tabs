@@ -45,6 +45,8 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 	r.GET("/category/:name", ch.getMusiciansByGategory)
 	r.GET("/file", ch.downloadFile)
 
+	r.GET("/post/:id", ch.getPost)
+
 	r.POST("/", ch.getToken)
 	r.POST("/vk", ch.getTokenVK)
 	r.GET("/", ch.refreshToken)

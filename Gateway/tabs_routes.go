@@ -118,7 +118,7 @@ func (ch *clientHolder) uploadFile(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, &postRenderInfo{
+	c.JSON(http.StatusOK, postRenderInfo{
 		Tab:  *tab,
 		Post: *post,
 	})
