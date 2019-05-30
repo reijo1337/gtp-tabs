@@ -21,6 +21,7 @@ type StorageClientInterface interface {
 	GetAuthorsByCategory(name string) ([]MusiciansWithCount, error)
 	UploadFile(upload *FileUploadRequest) (*TabInfo, error)
 	DownloadFile(name string) (FileDownloadResponse, error)
+	GetTab(tabID int) (*TabInfo, error)
 }
 
 type StorageClient struct {
@@ -31,6 +32,35 @@ func MakeStorageClient(host string, port string) StorageClientInterface {
 	return &StorageClient{
 		url: fmt.Sprintf("http://%s:%s", host, port),
 	}
+}
+
+func (sc *StorageClient) GetTab(tabID int) (*TabInfo, error) {
+	resp, err := http.Get(fmt.Sprintf("%s/tab/%d", sc.url, tabID))
+	if err != nil {
+		log.Println("Can't get tab from service", err)
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Can't read body", err)
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		errResp := ErrorResponse{}
+		err = json.Unmarshal(body, &errResp)
+		if err != nil {
+			return nil, err
+		}
+		return nil, errors.New(errResp.Error)
+	}
+
+	var ret *TabInfo
+	err = json.Unmarshal(body, ret)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
 func (sc *StorageClient) GetAuthorsByLetter(letter string) ([]MusiciansWithCount, error) {

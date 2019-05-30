@@ -118,7 +118,10 @@ func (ch *clientHolder) uploadFile(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, post)
+	c.JSON(http.StatusOK, &postRenderInfo{
+		Tab:  *tab,
+		Post: *post,
+	})
 }
 
 func (ch *clientHolder) downloadFile(c *gin.Context) {

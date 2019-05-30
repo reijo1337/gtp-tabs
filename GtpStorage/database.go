@@ -222,3 +222,20 @@ func (db *Database) createSong(musicianID, categoryID int32, name string, size i
 		musicianID, name, categoryID, size).Scan(&tabID)
 	return tabID, err
 }
+
+func (db *Database) tabByID(tabID int) (tabInfo, error) {
+	var tab tabInfo
+
+	if err := db.QueryRow("select * from tabs where id = $1", tabID).Scan(
+		&tab.ID, &tab.Author.ID, &tab.Name, &tab.Cat.ID, &tab.Size); err != nil {
+		return tabInfo{}, fmt.Errorf("getting tab info from db: %v", err)
+	}
+	if err := db.QueryRow("select name from musicians where id = $1", tab.Author.ID).Scan(&tab.Author.Name); err != nil {
+		return tabInfo{}, fmt.Errorf("getting musician: %v", err)
+	}
+	if err := db.QueryRow("select name from categories where id = $1", tab.Cat.ID).Scan(&tab.Cat.Name); err != nil {
+		return tabInfo{}, fmt.Errorf("getting category: %v", err)
+	}
+
+	return tab, nil
+}

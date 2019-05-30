@@ -35,9 +35,26 @@ func SetUpRouter() (*gin.Engine, error) {
 	r.GET("/musicians/:search", s.GetAuthorsByName)
 	r.GET("/tabs/:search", s.FindTabsByName)
 	r.GET("/category/:name", s.GetAuthorsByCategory)
+	r.GET("/tab/:id", s.getTabByID)
 	r.PUT("/file", s.Upload)
 	r.GET("/file", s.Download)
 	return r, nil
+}
+
+func (s *service) getTabByID(c *gin.Context) {
+	tabID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("getting tab id: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "incorrect id"})
+		return
+	}
+	tab, err := s.db.tabByID(tabID)
+	if err != nil {
+		log.Printf("getting tab by id: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't get tab"})
+		return
+	}
+	c.JSON(http.StatusOK, tab)
 }
 
 // GetAuthorsByLetter возвращает список музыкантов и количество их исполнителей через поиск по первой букве
