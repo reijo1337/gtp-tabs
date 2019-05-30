@@ -1,9 +1,9 @@
 package clients
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,7 +19,7 @@ type StorageClientInterface interface {
 	GetAuthorsByName(search string) ([]MusiciansWithCount, error)
 	FindTabsByName(search string) ([]TabWithSize, error)
 	GetAuthorsByCategory(name string) ([]MusiciansWithCount, error)
-	UploadFile(reader io.Reader) error
+	UploadFile(upload *FileUploadRequest) error
 	DownloadFile(name string) (FileDownloadResponse, error)
 }
 
@@ -117,16 +117,21 @@ func (sc *StorageClient) GetAuthorsByCategory(name string) ([]MusiciansWithCount
 	return sc.returnMusicians(resp)
 }
 
-func (sc *StorageClient) UploadFile(reader io.Reader) error {
+func (sc *StorageClient) UploadFile(upload *FileUploadRequest) error {
+	stringsUpload, err := json.Marshal(upload)
+	if err != nil {
+		return fmt.Errorf("marshal upload request: %v", err)
+	}
+	reader := bytes.NewReader(stringsUpload)
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/file", sc.url), reader)
 	if err != nil {
-		return err
+		return fmt.Errorf("making upload request: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("sending upload request: %v", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
@@ -134,9 +139,9 @@ func (sc *StorageClient) UploadFile(reader io.Reader) error {
 		errResp := ErrorResponse{}
 		err = json.Unmarshal(body, &errResp)
 		if err != nil {
-			return err
+			return fmt.Errorf("getting error upload response: %v", err)
 		}
-		return errors.New(errResp.Error)
+		return fmt.Errorf("error upload response: %v", err)
 	}
 	return nil
 }
@@ -144,8 +149,7 @@ func (sc *StorageClient) UploadFile(reader io.Reader) error {
 func (sc *StorageClient) DownloadFile(name string) (FileDownloadResponse, error) {
 	resp, err := http.Get(fmt.Sprintf("%s/file?name=%s", sc.url, name))
 	if err != nil {
-		log.Println("Can't get file from service", err)
-		return FileDownloadResponse{}, err
+		return FileDownloadResponse{}, fmt.Errorf("getting file: %v", err)
 	}
 	var ret FileDownloadResponse
 	ret.FileContent = resp.Body

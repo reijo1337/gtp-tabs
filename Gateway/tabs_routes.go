@@ -1,9 +1,11 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gtp-tabs/Gateway/clients"
 )
 
 func (ch *clientHolder) getAuthorsByLetter(c *gin.Context) {
@@ -94,16 +96,22 @@ func (ch *clientHolder) getMusiciansByGategory(c *gin.Context) {
 }
 
 func (ch *clientHolder) uploadFile(c *gin.Context) {
-	err := ch.storage.UploadFile(c.Request.Body)
-	if err != nil {
-		c.JSON(
-			http.StatusBadRequest,
-			gin.H{
-				"error": err.Error(),
-			},
-		)
+	var upload *clients.FileUploadRequest
+	if err := c.BindJSON(upload); err != nil {
+		log.Printf("binding request body: %v", err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
+	err := ch.storage.UploadFile(upload)
+	if err != nil {
+		log.Printf("sending file: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't send file"})
+		return
+	}
+	post := &clients.Post{
+		SongName: upload.Song,
+	}
+	ch.post.SetPost(post)
 	c.Status(http.StatusOK)
 }
 

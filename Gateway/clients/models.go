@@ -109,3 +109,11 @@ type UpdateRatingRequest struct {
 	PostID int `json:"post_id"`
 	Rating int `json:"rating"`
 }
+
+type FileUploadRequest struct {
+	Filename string `json:"filename"`
+	Song     string `json:"song"`
+	Musician string `json:"musician"`
+	Category string `json:"category"`
+	Content  string `json:"content"`
+}
