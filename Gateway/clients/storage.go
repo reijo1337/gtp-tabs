@@ -19,7 +19,7 @@ type StorageClientInterface interface {
 	GetAuthorsByName(search string) ([]MusiciansWithCount, error)
 	FindTabsByName(search string) ([]TabWithSize, error)
 	GetAuthorsByCategory(name string) ([]MusiciansWithCount, error)
-	UploadFile(upload *FileUploadRequest) error
+	UploadFile(upload *FileUploadRequest) (*TabInfo, error)
 	DownloadFile(name string) (FileDownloadResponse, error)
 }
 
@@ -117,33 +117,38 @@ func (sc *StorageClient) GetAuthorsByCategory(name string) ([]MusiciansWithCount
 	return sc.returnMusicians(resp)
 }
 
-func (sc *StorageClient) UploadFile(upload *FileUploadRequest) error {
+func (sc *StorageClient) UploadFile(upload *FileUploadRequest) (*TabInfo, error) {
 	stringsUpload, err := json.Marshal(upload)
 	if err != nil {
-		return fmt.Errorf("marshal upload request: %v", err)
+		return nil, fmt.Errorf("marshal upload request: %v", err)
 	}
 	reader := bytes.NewReader(stringsUpload)
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/file", sc.url), reader)
 	if err != nil {
-		return fmt.Errorf("making upload request: %v", err)
+		return nil, fmt.Errorf("making upload request: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("sending upload request: %v", err)
+		return nil, fmt.Errorf("sending upload request: %v", err)
 	}
 	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(resp.Body)
 		errResp := ErrorResponse{}
 		err = json.Unmarshal(body, &errResp)
 		if err != nil {
-			return fmt.Errorf("getting error upload response: %v", err)
+			return nil, fmt.Errorf("getting error upload response: %v", err)
 		}
-		return fmt.Errorf("error upload response: %v", err)
+		return nil, fmt.Errorf("error upload response: %v", err)
 	}
-	return nil
+	var ret *TabInfo
+	err = json.Unmarshal(body, ret)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
 func (sc *StorageClient) DownloadFile(name string) (FileDownloadResponse, error) {

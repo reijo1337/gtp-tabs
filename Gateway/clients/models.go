@@ -117,3 +117,21 @@ type FileUploadRequest struct {
 	Category string `json:"category"`
 	Content  string `json:"content"`
 }
+
+type TabInfo struct {
+	ID     int      `json:"id"`
+	Author Musician `json:"musician"`
+	Name   string   `json:"name"`
+	Size   int64    `json:"size"`
+	Cat    Category `json:"category"`
+}
+
+type Category struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Musician struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}

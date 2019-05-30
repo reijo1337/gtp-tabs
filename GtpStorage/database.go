@@ -198,18 +198,18 @@ func (db *Database) getOrCreateCategory(name string) (category, error) {
 	return ret, nil
 }
 
-func (db *Database) createSong(musicianID, categoryID int32, name string, size int64) error {
+func (db *Database) createSong(musicianID, categoryID int32, name string, size int64) (int, error) {
 	var ID string
 	err := db.QueryRow("SELECT name FROM tabs WHERE author = $1 AND category = $2 AND name LIKE '"+name+"%' ORDER BY name DESC LIMIT 1", musicianID, categoryID).Scan(&ID)
 	if err != nil {
 		if err != sql.ErrNoRows {
-			return err
+			return 0, err
 		}
 	} else {
 		if ID[len(ID)-1] == ')' {
 			nameN, err := strconv.Atoi(ID[len(ID)-2 : len(ID)-1])
 			if err != nil {
-				return err
+				return 0, err
 			}
 			newNameN := strconv.Itoa(nameN + 1)
 			name = ID[:len(ID)-2] + newNameN + ")"
@@ -217,7 +217,8 @@ func (db *Database) createSong(musicianID, categoryID int32, name string, size i
 			name = name + " (1)"
 		}
 	}
-	_, err = db.Exec("INSERT INTO tabs (author, name, category, size) VALUES ($1, $2, $3, $4)",
-		musicianID, name, categoryID, size)
-	return err
+	var tabID int
+	err = db.QueryRow("INSERT INTO tabs (author, name, category, size) VALUES ($1, $2, $3, $4) returning id",
+		musicianID, name, categoryID, size).Scan(&tabID)
+	return tabID, err
 }

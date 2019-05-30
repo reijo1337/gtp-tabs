@@ -31,3 +31,11 @@ type category struct {
 	ID   int32  `json:"id"`
 	Name string `json:"name"`
 }
+
+type tabInfo struct {
+	ID     int      `json:"id"`
+	Author musician `json:"musician"`
+	Name   string   `json:"name"`
+	Size   int64    `json:"size"`
+	Cat    category `json:"category"`
+}

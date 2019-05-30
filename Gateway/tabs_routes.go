@@ -102,7 +102,7 @@ func (ch *clientHolder) uploadFile(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	err := ch.storage.UploadFile(upload)
+	tab, err := ch.storage.UploadFile(upload)
 	if err != nil {
 		log.Printf("sending file: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't send file"})
@@ -110,9 +110,15 @@ func (ch *clientHolder) uploadFile(c *gin.Context) {
 	}
 	post := &clients.Post{
 		SongName: upload.Song,
+		TabID:    tab.ID,
+		AuthorID: tab.Author.ID,
 	}
-	ch.post.SetPost(post)
-	c.Status(http.StatusOK)
+	if err := ch.post.SetPost(post); err != nil {
+		log.Printf("making post: %v", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, post)
 }
 
 func (ch *clientHolder) downloadFile(c *gin.Context) {

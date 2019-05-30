@@ -223,7 +223,7 @@ func (s *service) Upload(c *gin.Context) {
 		)
 		return
 	}
-	err = s.db.createSong(mus.ID, cat.ID, req.Song, fi.Size())
+	tabID, err := s.db.createSong(mus.ID, cat.ID, req.Song, fi.Size())
 	if err != nil {
 		log.Println("Can't save info about file", err)
 		c.JSON(
@@ -234,12 +234,14 @@ func (s *service) Upload(c *gin.Context) {
 		)
 		return
 	}
-	c.JSON(
-		http.StatusOK,
-		gin.H{
-			"ok": "ok",
-		},
-	)
+	tab := &tabInfo{
+		ID:     tabID,
+		Author: mus,
+		Name:   req.Song,
+		Cat:    cat,
+		Size:   fi.Size(),
+	}
+	c.JSON(http.StatusOK, tab)
 }
 
 // Download скачивание файла
