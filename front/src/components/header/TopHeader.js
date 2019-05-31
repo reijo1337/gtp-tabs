@@ -7,20 +7,35 @@ class TopHeader extends Component {
     constructor(...args) {
         super(...args);
 
-        this.state = { modalShow: false };
+        const login = localStorage.getItem("login");
+        console.log(login);
+        this.state = {
+            registerShow: false,
+            loginShow: false,
+            login: login,
+            authorized: (login !== null && login !== ""),
+        };
     }
     render() {
         let topButtons;
-        topButtons = <div>
-            <Button
-                variant="outline-info"
-                onClick={() => this.setState({ loginShow: true })}
-            >Войти</Button>
-            <Button
-                variant="outline-info"
-                onClick={() => this.setState({ registerShow: true })}
-            >Регистрация</Button>
-        </div>;
+        if (this.state.authorized) {
+            topButtons = <div>
+                <Button
+                    variant="outline-info"
+                >{this.state.login}</Button>
+            </div>
+        } else {
+            topButtons = <div>
+                <Button
+                    variant="outline-info"
+                    onClick={() => this.setState({loginShow: true})}
+                >Войти</Button>
+                <Button
+                    variant="outline-info"
+                    onClick={() => this.setState({registerShow: true})}
+                >Регистрация</Button>
+            </div>;
+        }
         let registerClose = () => this.setState({ registerShow: false });
         let loginClose = () => this.setState({ loginShow: false });
         return (
