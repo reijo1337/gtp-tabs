@@ -28,7 +28,7 @@ func setUpRouter() (*gin.Engine, error) {
 		return nil, fmt.Errorf("make service: %v", err)
 	}
 	r.GET("/profile/:id", s.getProfile)
-	r.GET("/profile/user/:id", s.getProfileByAccount)
+	r.GET("/user/:id", s.getProfileByAccount)
 	r.POST("/profile", s.setNewProfile)
 	return r, nil
 }

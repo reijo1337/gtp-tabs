@@ -7,7 +7,7 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags)
-	config, err := parseConfig("GATEWAY")
+	config, err := parseConfig("")
 	if err != nil {
 		log.Panicln("Can't read config:", err)
 	}

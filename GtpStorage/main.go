@@ -6,7 +6,7 @@ import (
 
 func main() {
 	log.SetFlags(log.LstdFlags)
-	config, err := parseConfig("STORAGE")
+	config, err := parseConfig("")
 	if err != nil {
 		log.Panicln("Can't read config:", err)
 	}
@@ -15,5 +15,5 @@ func main() {
 		log.Panicln("Can't set up server:", err)
 	}
 	log.Println("Starting server on port ", config.Port)
-	r.Run(":" + config.Port)
+	r.Run(config.Port)
 }

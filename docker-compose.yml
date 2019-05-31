@@ -13,27 +13,31 @@ services:
   auth:
     build: ./AuthService
     restart: always
+    depends_on:
+      - "db"
     environment:
       DB_USER: "postgres"
       DB_PASSWORD: "postgres"
       DB_HOST: "db"
       DB_NAME: "postgres"
       PRIVATE_KEY: "/etc/keys/private.pem"
+      PORT: ":9091"
     volumes:
       - /home/tantsevov/workspace/gtp-tabs/keys/gtp:/etc/keys
     ports:
-      - "9091:9090"
-  # feedback:
-  #   build: ./FeedbackService
-  #   restart: always
-  #   environment:
-  #     DB_SOURCE: "user=postgres password=postgres dbname=postgres host=db sslmode=disable"
-  #     SMTP_URL: ""
-  #     SMTP_PORT: ""
-  #     SMTP_LOGIN: ""
-  #     SMTP_PASSWORD: ""
-  #   ports:
-  #     - "9092:9090"
+      - "9091:9091"
+  feedback:
+    build: ./FeedbackService
+    restart: always
+    environment:
+      DB_SOURCE: "user=postgres password=postgres dbname=postgres host=db sslmode=disable"
+      SMTP_URL: ""
+      SMTP_PORT: "423"
+      SMTP_LOGIN: ""
+      SMTP_PASSWORD: ""
+      PORT: ":9092"
+    ports:
+      - "9092:9092"
   gateway:
     build: ./Gateway
     restart: always
@@ -43,6 +47,7 @@ services:
       URL_POST: "post"
       URL_PROFILE: "profile"
       PUBLIC_KEY_LOC: "/etc/keys/public.pem"
+      PORT: ":9090"
     volumes:
       - /home/tantsevov/workspace/gtp-tabs/keys/gtp:/etc/keys
     ports:
@@ -55,15 +60,17 @@ services:
       DB_PASSWORD: "postgres"
       DB_HOST: "db"
       DB_NAME: "postgres"
+      PORT: ":9093"
     ports:
-      - "9093:9090"
+      - "9093:9093"
   post:
     build: ./PostService
     restart: always
     environment:
       DB_SOURCE: "user=postgres password=postgres dbname=postgres host=db sslmode=disable"
+      PORT: ":9094"
     ports:
-      - "9094:9090"
+      - "9094:9094"
   profile:
     build: ./ProfileService
     restart: always
@@ -72,5 +79,6 @@ services:
       DB_PASSWORD: "postgres"
       DB_HOST: "db"
       DB_NAME: "postgres"
+      PORT: ":9095"
     ports:
-      - "9095:9090"
+      - "9095:9095"

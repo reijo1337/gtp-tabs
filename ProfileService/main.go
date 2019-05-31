@@ -4,7 +4,7 @@ import "log"
 
 func main() {
 	log.SetFlags(log.LstdFlags)
-	config, err := parseConfig("GATEWAY")
+	config, err := parseConfig("")
 	if err != nil {
 		log.Panicln("Can't read config:", err)
 	}
@@ -12,5 +12,5 @@ func main() {
 	if err != nil {
 		log.Panicln("Can't set up router:", err)
 	}
-	r.Run(":" + config.Port)
+	r.Run(config.Port)
 }

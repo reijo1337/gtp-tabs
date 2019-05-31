@@ -27,7 +27,7 @@ func MakeProfileClient(url string) ProfileClientInterface {
 }
 
 func (pc *ProfileClient) GetProfileByAcc(userID int) (*ProfileInfo, error) {
-	url := fmt.Sprintf("%s/profile/user/%d", pc.url, userID)
+	url := fmt.Sprintf("%s/user/%d", pc.url, userID)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("send refresh request: %v", err)
