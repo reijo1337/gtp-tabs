@@ -1,13 +1,28 @@
 import React, {Component} from 'react';
 import {Button, Form, Nav, Navbar} from "react-bootstrap";
+import Register from "../login/Register";
+import Login from "../login/Login";
 
 class TopHeader extends Component {
+    constructor(...args) {
+        super(...args);
+
+        this.state = { modalShow: false };
+    }
     render() {
         let topButtons;
         topButtons = <div>
-            <Button variant="outline-info">Войти</Button>
-            <Button variant="outline-info">Регистрация</Button>
+            <Button
+                variant="outline-info"
+                onClick={() => this.setState({ loginShow: true })}
+            >Войти</Button>
+            <Button
+                variant="outline-info"
+                onClick={() => this.setState({ registerShow: true })}
+            >Регистрация</Button>
         </div>;
+        let registerClose = () => this.setState({ registerShow: false });
+        let loginClose = () => this.setState({ loginShow: false });
         return (
             <div>
                 <Navbar bg="dark" variant="dark">
@@ -19,6 +34,13 @@ class TopHeader extends Component {
                         {topButtons}
                     </Form>
                 </Navbar>
+                <Register
+                    show={this.state.registerShow}
+                    onHide={registerClose}
+                />
+                <Login
+                    show={this.state.loginShow}
+                    onHide={loginClose}/>
             </div>
         );
     }
