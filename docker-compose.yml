@@ -23,3 +23,27 @@ services:
       - /home/tantsevov/workspace/gtp-tabs/keys/gtp:/etc/keys
     ports:
       - "9091:9090"
+  # feedback:
+  #   build: ./FeedbackService
+  #   restart: always
+  #   environment:
+  #     DB_SOURCE: "user=postgres password=postgres dbname=postgres host=db sslmode=disable"
+  #     SMTP_URL: ""
+  #     SMTP_PORT: ""
+  #     SMTP_LOGIN: ""
+  #     SMTP_PASSWORD: ""
+  #   ports:
+  #     - "9092:9090"
+  gateway:
+    build: ./Gateway
+    restart: always
+    environment:
+      URL_STORAGE: "storage"
+      URL_AUTH: "auth"
+      URL_POST: "post"
+      URL_PROFILE: "profile"
+      PUBLIC_KEY_LOC: "/etc/keys/public.pem"
+    volumes:
+      - /home/tantsevov/workspace/gtp-tabs/keys/gtp:/etc/keys
+    ports:
+      - "9090:9090"

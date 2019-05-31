@@ -19,9 +19,9 @@ type PostClient struct {
 	url string
 }
 
-func MakePostClient(host string, port string) PostClientInterface {
+func MakePostClient(url string) PostClientInterface {
 	return &PostClient{
-		url: fmt.Sprintf("http://%s:%s", host, port),
+		url: url,
 	}
 }
 

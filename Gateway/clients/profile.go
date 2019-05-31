@@ -20,9 +20,9 @@ type ProfileClient struct {
 }
 
 // MakeProfileClient -
-func MakeProfileClient(host string, port string) ProfileClientInterface {
+func MakeProfileClient(url string) ProfileClientInterface {
 	return &ProfileClient{
-		url: fmt.Sprintf("http://%s:%s", host, port),
+		url: url,
 	}
 }
 

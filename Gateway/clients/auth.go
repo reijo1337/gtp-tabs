@@ -22,9 +22,9 @@ type AuthClient struct {
 }
 
 // MakeAuthClient -
-func MakeAuthClient(host string, port string) AuthClientInterface {
+func MakeAuthClient(url string) AuthClientInterface {
 	return &AuthClient{
-		url: fmt.Sprintf("http://%s:%s", host, port),
+		url: url,
 	}
 }
 

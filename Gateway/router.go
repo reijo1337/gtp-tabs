@@ -19,9 +19,10 @@ func setUpClientHolder() (*clientHolder, error) {
 	}
 
 	return &clientHolder{
-		storage: clients.MakeStorageClient(config.Storage.Host, config.Storage.Port),
-		auth:    clients.MakeAuthClient(config.Storage.Host, config.Storage.Port),
-		profile: clients.MakeProfileClient(config.Storage.Host, config.Storage.Port),
+		storage: clients.MakeStorageClient(config.URL.Storage),
+		auth:    clients.MakeAuthClient(config.URL.Auth),
+		profile: clients.MakeProfileClient(config.URL.Profile),
+		post:    clients.MakePostClient(config.URL.Post),
 	}, nil
 }
 

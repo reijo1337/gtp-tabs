@@ -28,9 +28,9 @@ type StorageClient struct {
 	url string
 }
 
-func MakeStorageClient(host string, port string) StorageClientInterface {
+func MakeStorageClient(url string) StorageClientInterface {
 	return &StorageClient{
-		url: fmt.Sprintf("http://%s:%s", host, port),
+		url: url,
 	}
 }
 
