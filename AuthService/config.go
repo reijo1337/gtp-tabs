@@ -18,7 +18,7 @@ type config struct {
 		AccessExpiration  time.Duration `default:"30m" envconfig:"TOKEN_ACCESS_EXPIRATION"`
 		RefreshExpiration time.Duration `default:"300m" envconfig:"TOKEN_REFRESH_EXPIRATION"`
 	}
-	Port string `default:"8081"`
+	Port string `default:"9090"`
 }
 
 func parseConfig(app string) (cfg config, err error) {

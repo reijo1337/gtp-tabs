@@ -14,7 +14,7 @@ type config struct {
 		Login    string `default:"tantsevov"`
 		Password string
 	}
-	Port string `default:"8085" envconfig:"PORT"`
+	Port string `default:"9090" envconfig:"PORT"`
 }
 
 func parseConfig(app string) (cfg config, err error) {

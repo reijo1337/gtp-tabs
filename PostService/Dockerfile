@@ -1,12 +1,12 @@
 FROM golang:1.12 AS stage
 ENV CGO_ENABLED 0
-WORKDIR /GtpStorage
+WORKDIR /PostService
 COPY . .
 RUN go build -mod=vendor -o ./application ./*.go
 
 FROM alpine:3.7
-WORKDIR /GtpStorage
-COPY --from=stage GtpStorage/application application
+WORKDIR /PostService
+COPY --from=stage PostService/application application
 ENV PORT ":9090"
 EXPOSE 9090
-ENTRYPOINT [ "/GtpStorage/application" ]
+ENTRYPOINT [ "/PostService/application" ]
