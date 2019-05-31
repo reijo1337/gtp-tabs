@@ -47,3 +47,30 @@ services:
       - /home/tantsevov/workspace/gtp-tabs/keys/gtp:/etc/keys
     ports:
       - "9090:9090"
+  storage:
+    build: ./GtpStorage
+    restart: always
+    environment:
+      DB_USER: "postgres"
+      DB_PASSWORD: "postgres"
+      DB_HOST: "db"
+      DB_NAME: "postgres"
+    ports:
+      - "9093:9090"
+  post:
+    build: ./PostService
+    restart: always
+    environment:
+      DB_SOURCE: "user=postgres password=postgres dbname=postgres host=db sslmode=disable"
+    ports:
+      - "9094:9090"
+  profile:
+    build: ./ProfileService
+    restart: always
+    environment:
+      DB_USER: "postgres"
+      DB_PASSWORD: "postgres"
+      DB_HOST: "db"
+      DB_NAME: "postgres"
+    ports:
+      - "9095:9090"
