@@ -2,19 +2,45 @@ import React, {Component} from 'react';
 import {Button, Form, Nav, Navbar} from "react-bootstrap";
 import Register from "../login/Register";
 import Login from "../login/Login";
+import jwtDecode from "jwt-decode"
 
 class TopHeader extends Component {
     constructor(...args) {
         super(...args);
-
-        const login = localStorage.getItem("login");
-        console.log(login);
-        this.state = {
-            registerShow: false,
-            loginShow: false,
-            login: login,
-            authorized: (login !== null && login !== ""),
-        };
+        const token = localStorage.getItem("accessToken");
+        if (token === null || token === "") {
+            this.state = {
+                registerShow: false,
+                loginShow: false,
+                login: '',
+                password: '',
+                authorized: false,
+            };
+            return
+        }
+        let tokenData = jwtDecode(token);
+        let interval = (tokenData.exp - (Date.now().valueOf() / 1000))-10;
+        if (interval < 0) {
+            localStorage.setItem("accessToken", "");
+            localStorage.setItem("refreshToken", "");
+            localStorage.setItem("login", "");
+            this.state = {
+                registerShow: false,
+                loginShow: false,
+                login: '',
+                password: '',
+                authorized: false,
+            }
+        } else {
+            const login = localStorage.getItem("login");
+            this.state = {
+                registerShow: false,
+                loginShow: false,
+                login: login,
+                password: '',
+                authorized: true,
+            };
+        }
     }
     render() {
         let topButtons;

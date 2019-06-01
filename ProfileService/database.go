@@ -103,7 +103,7 @@ func (db *database) getInstruments(id int) ([]instrument, error) {
 }
 
 func (db *database) setNewUser(user *userInfo) error {
-	if err := db.QueryRow("insert into user_info (account_id, name, registered, bitrhday) vales ($1, $2, now(), $3) returning id, registered",
+	if err := db.QueryRow("insert into user_info (account_id, name, registered, birthday) values ($1, $2, now(), $3) returning id, registered",
 		user.AccountID, user.Name, user.Birthday).Scan(&(user.ID), &(user.Registered)); err != nil {
 		return fmt.Errorf("inserting new user: %v", err)
 	}

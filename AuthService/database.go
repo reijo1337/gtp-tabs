@@ -82,11 +82,7 @@ func (db *Database) insertNewUser(login string, password string, role string) (*
 	passStr := fmt.Sprintf("%x\n", pass)
 
 	var ID int32
-	if err = db.QueryRow("SELECT id FROM users WHERE login = $1 and role = $2", login, roleID).Scan(&ID); err != nil {
-		return nil, err
-	}
-
-	if ID > 0 {
+	if err = db.QueryRow("SELECT id FROM users WHERE login = $1 and role = $2", login, roleID).Scan(&ID); err == nil {
 		return &user{ID: ID, Login: login, Password: password}, nil
 	}
 

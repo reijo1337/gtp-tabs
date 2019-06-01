@@ -23,7 +23,7 @@ services:
       PRIVATE_KEY: "/etc/keys/private.pem"
       PORT: ":9091"
     volumes:
-      - /home/tantsevov/workspace/gtp-tabs/keys/gtp:/etc/keys
+      - /home/g-tantsevov/keys:/etc/keys
     ports:
       - "9091:9091"
   feedback:
@@ -43,13 +43,13 @@ services:
     restart: always
     environment:
       URL_STORAGE: "storage"
-      URL_AUTH: "auth"
+      URL_AUTH: "auth:9091"
       URL_POST: "post"
-      URL_PROFILE: "profile"
+      URL_PROFILE: "profile:9095"
       PUBLIC_KEY_LOC: "/etc/keys/public.pem"
       PORT: ":9090"
     volumes:
-      - /home/tantsevov/workspace/gtp-tabs/keys/gtp:/etc/keys
+      - /home/g-tantsevov/keys:/etc/keys
     ports:
       - "9090:9090"
   storage:

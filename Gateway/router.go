@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gtp-tabs/Gateway/clients"
 )
@@ -13,7 +15,7 @@ type clientHolder struct {
 }
 
 func setUpClientHolder() (*clientHolder, error) {
-	config, err := parseConfig("GATEWAY")
+	config, err := parseConfig("")
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +56,9 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 
 	reg := r.Group("/register")
 	reg.POST("/", ch.register)
+	reg.OPTIONS("/", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
 	reg.POST("/vk", ch.registerVk)
 
 	r.POST("/auth", ch.login)

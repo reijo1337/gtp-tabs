@@ -24,7 +24,7 @@ type AuthClient struct {
 // MakeAuthClient -
 func MakeAuthClient(url string) AuthClientInterface {
 	return &AuthClient{
-		url: url,
+		url: fmt.Sprintf("http://%s", url),
 	}
 }
 
@@ -33,7 +33,7 @@ func (ac *AuthClient) Register(user *User) (*RegisterResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parsing user: %v", err)
 	}
-	url := fmt.Sprintf("%s/register", ac.url)
+	url := fmt.Sprintf("%s/register/", ac.url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}

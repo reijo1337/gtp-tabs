@@ -22,7 +22,7 @@ type ProfileClient struct {
 // MakeProfileClient -
 func MakeProfileClient(url string) ProfileClientInterface {
 	return &ProfileClient{
-		url: url,
+		url: fmt.Sprintf("http://%s", url),
 	}
 }
 
@@ -79,7 +79,7 @@ func (pc *ProfileClient) SetProfile(user *ProfileInfo) error {
 	if err != nil {
 		return fmt.Errorf("parsing user: %v", err)
 	}
-	url := fmt.Sprintf("%s/register", pc.url)
+	url := fmt.Sprintf("%s/profile", pc.url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
