@@ -6,6 +6,7 @@ import jwtDecode from "jwt-decode";
 class Login extends Component {
     constructor(props) {
         super(props);
+        this.url = "http://localhost:9090/auth";
         this.state = {
             login: "",
             password: "",
@@ -95,16 +96,18 @@ class Login extends Component {
                 if (json.error) {
                     throw new Error(json.error);
                 }
-                localStorage.setItem("accessToken", json.accessToken);
-                localStorage.setItem("refreshToken", json.refreshToken);
+                localStorage.setItem("accessToken", json.tokens.accessToken);
+                localStorage.setItem("refreshToken", json.tokens.refreshToken);
+                localStorage.setItem("profileID", json.tokens.profile_id);
                 localStorage.setItem("login", this.state.login);
                 clearInterval(this._tokenUpdater);
-                const token = json.accessToken;
+                const token = json.tokens.accessToken;
                 let tokenData = jwtDecode(token);
                 let interval = (tokenData.exp - (Date.now().valueOf() / 1000))-10;
 
                 this._tokenUpdater = setInterval(updater.bind(this),interval*1000);
-                this.setState({authorized: true})
+                this.props.setAuth();
+                this.props.setClose();
             })
             .catch((error) => {
                 alert("Проблемы с доступом в джойказино: " + error.message);

@@ -113,6 +113,7 @@ class Register extends Component {
                 localStorage.setItem("accessToken", json.tokens.accessToken);
                 localStorage.setItem("refreshToken", json.tokens.refreshToken);
                 localStorage.setItem("login", json.user.login);
+                localStorage.setItem("profileID", json.profile.id);
                 clearInterval(this._tokenUpdater);
                 const token = json.tokens.accessToken;
                 let tokenData = jwtDecode(token);

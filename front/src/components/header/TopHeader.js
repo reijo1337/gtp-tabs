@@ -50,6 +50,12 @@ class TopHeader extends Component {
                 <Button
                     variant="outline-info"
                 >{this.state.login}</Button>
+                <Button
+                    variant="outline-info"
+                    onClick={this.logout}
+                >
+                    Выйти
+                </Button>
             </div>
         } else {
             topButtons = <div>
@@ -82,6 +88,8 @@ class TopHeader extends Component {
                 />
                 <Login
                     show={this.state.loginShow}
+                    setAuth={this.authorized.bind(this)}
+                    setClose={this.loginClose.bind(this)}
                     onHide={this.loginClose.bind(this)}/>
             </div>
         );
@@ -94,6 +102,15 @@ class TopHeader extends Component {
     };
     registerClose = () => this.setState({ registerShow: false });
     loginClose = () => this.setState({ loginShow: false });
+    logout = () => {
+        this.setState({
+            authorized: false,
+            login: "",
+        });
+        localStorage.setItem("accessToken", "");
+        localStorage.setItem("refreshToken", "");
+        localStorage.setItem("login", "");
+    }
 }
 
 export default TopHeader;

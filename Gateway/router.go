@@ -40,6 +40,9 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 	}
 	authorized := r.Group("/", auth.verifyToken())
 	authorized.POST("/file", ch.uploadFile)
+	authorized.OPTIONS("/file", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
 	authorized.GET("/profile/:id", ch.getProfile)
 
 	r.GET("/alph/:code", ch.getAuthorsByLetter)
@@ -52,6 +55,9 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 
 	r.POST("/", ch.getToken)
 	r.POST("/vk", ch.getTokenVK)
+	r.OPTIONS("/vk", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
 	r.GET("/", ch.refreshToken)
 
 	reg := r.Group("/register")
@@ -60,8 +66,14 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 		c.Status(http.StatusOK)
 	})
 	reg.POST("/vk", ch.registerVk)
+	reg.OPTIONS("/vk", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
 
 	r.POST("/auth", ch.login)
+	r.OPTIONS("/auth", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
 	r.GET("/auth", ch.refresh)
 
 	return r, nil
