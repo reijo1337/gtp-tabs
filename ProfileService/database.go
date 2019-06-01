@@ -47,7 +47,7 @@ func createSchema(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS user_info (
 		id SERIAL NOT NULL PRIMARY KEY,
 		account_id INT NOT NULL,
-		name VARCHAR(50) NOT NULL UNIQUE,
+		name VARCHAR(50) NOT NULL,
 		registered DATE,
 		birthday DATE
 	)`); err != nil {

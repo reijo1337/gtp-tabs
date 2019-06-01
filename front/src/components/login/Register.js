@@ -89,7 +89,6 @@ class Register extends Component {
                 name: "user",
             },
         });
-        debugger;
         fetch(this.url, {
             method: "post",
             headers: {
@@ -99,6 +98,7 @@ class Register extends Component {
             body: data
         })
             .then( res => {
+                debugger;
                 if (res.status === 200) {
                     return parse_json(res);
                 } else {
@@ -109,16 +109,18 @@ class Register extends Component {
                 if (json.error) {
                     throw new Error(json.error);
                 }
-                localStorage.setItem("accessToken", json.accessToken);
-                localStorage.setItem("refreshToken", json.refreshToken);
-                localStorage.setItem("login", this.state.login);
+                debugger;
+                localStorage.setItem("accessToken", json.tokens.accessToken);
+                localStorage.setItem("refreshToken", json.tokens.refreshToken);
+                localStorage.setItem("login", json.user.login);
                 clearInterval(this._tokenUpdater);
-                const token = json.accessToken;
+                const token = json.tokens.accessToken;
                 let tokenData = jwtDecode(token);
                 let interval = (tokenData.exp - (Date.now().valueOf() / 1000))-10;
 
                 this._tokenUpdater = setInterval(updater.bind(this),interval*1000);
-                this.setState({authorized: true})
+                this.props.setAuth();
+                this.props.setClose();
             })
             .catch((error) => {
                 alert("Проблемы с доступом в джойказино: " + error.message);

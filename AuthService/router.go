@@ -266,8 +266,8 @@ func (s *service) register(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		gin.H{
-			"user":  *newUser,
-			"token": token,
+			"user":   *newUser,
+			"tokens": token,
 		},
 	)
 }

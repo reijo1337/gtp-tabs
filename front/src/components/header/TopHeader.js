@@ -42,6 +42,7 @@ class TopHeader extends Component {
             };
         }
     }
+
     render() {
         let topButtons;
         if (this.state.authorized) {
@@ -62,8 +63,6 @@ class TopHeader extends Component {
                 >Регистрация</Button>
             </div>;
         }
-        let registerClose = () => this.setState({ registerShow: false });
-        let loginClose = () => this.setState({ loginShow: false });
         return (
             <div>
                 <Navbar bg="dark" variant="dark">
@@ -77,14 +76,24 @@ class TopHeader extends Component {
                 </Navbar>
                 <Register
                     show={this.state.registerShow}
-                    onHide={registerClose}
+                    onHide={this.registerClose.bind(this)}
+                    setAuth={this.authorized.bind(this)}
+                    setClose={this.registerClose.bind(this)}
                 />
                 <Login
                     show={this.state.loginShow}
-                    onHide={loginClose}/>
+                    onHide={this.loginClose.bind(this)}/>
             </div>
         );
     }
+    authorized = () => {
+        this.setState({
+            authorized: true,
+            login: localStorage.getItem("login"),
+        });
+    };
+    registerClose = () => this.setState({ registerShow: false });
+    loginClose = () => this.setState({ loginShow: false });
 }
 
 export default TopHeader;

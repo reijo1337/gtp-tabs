@@ -34,6 +34,10 @@ func SetUpDatabase() (*Database, error) {
 		return nil, err
 	}
 
+	if err := populateDB(db); err != nil {
+		return nil, fmt.Errorf("populating db: %v", err)
+	}
+
 	ddb := &Database{DB: db}
 
 	log.Println("DB: succesful setup")
@@ -66,6 +70,23 @@ func createSchema(db *sql.DB) error {
 		return err
 	}
 
+	return nil
+}
+
+func populateDB(db *sql.DB) error {
+	var roleID int32
+	err := db.QueryRow("SELECT id FROM roles WHERE name = 'user'").Scan(&roleID)
+	if err != nil {
+		if _, err := db.Exec("insert into roles (name) values ('user')"); err != nil {
+			return fmt.Errorf("can't insert role user: %v", err)
+		}
+	}
+	err = db.QueryRow("SELECT id FROM roles WHERE name = 'amdin'").Scan(&roleID)
+	if err != nil {
+		if _, err := db.Exec("insert into roles (name) values ('amdin')"); err != nil {
+			return fmt.Errorf("can't insert role amdin: %v", err)
+		}
+	}
 	return nil
 }
 
