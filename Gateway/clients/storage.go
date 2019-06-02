@@ -55,7 +55,7 @@ func (sc *StorageClient) GetTab(tabID int) (*TabInfo, error) {
 		return nil, errors.New(errResp.Error)
 	}
 
-	var ret *TabInfo
+	ret := &TabInfo{}
 	err = json.Unmarshal(body, ret)
 	if err != nil {
 		return nil, err

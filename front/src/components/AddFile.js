@@ -78,6 +78,7 @@ class AddFile extends Component {
                     throw new Error(json.error);
                 }
                 alert("ok");
+                window.location.href = "http://127.0.0.1:3000/post/" + json.tab.id;
                 return json;
             })
             .catch(error => {

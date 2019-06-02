@@ -16,7 +16,7 @@ type Database struct {
 
 // SetUpDatabase устанавливает соединение с бд и разворачивает схему, если ее нет
 func SetUpDatabase() (*Database, error) {
-	config, err := parseConfig("STORAGE")
+	config, err := parseConfig("")
 	if err != nil {
 		return nil, err
 	}
@@ -200,23 +200,32 @@ func (db *Database) getOrCreateCategory(name string) (category, error) {
 
 func (db *Database) createSong(musicianID, categoryID int32, name string, size int64) (int, error) {
 	var ID string
-	err := db.QueryRow("SELECT name FROM tabs WHERE author = $1 AND category = $2 AND name LIKE '"+name+"%' ORDER BY name DESC LIMIT 1", musicianID, categoryID).Scan(&ID)
+	parts := strings.Split(name, ".")
+	name = parts[0]
+	dbExt := ""
+	if len(parts) > 1 {
+		dbExt = "." + parts[1]
+	}
+	err := db.QueryRow("SELECT name FROM tabs WHERE name LIKE '" + name + "%' ORDER BY name LIMIT 1").Scan(&ID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return 0, err
 		}
 	} else {
-		if ID[len(ID)-1] == ')' {
-			nameN, err := strconv.Atoi(ID[len(ID)-2 : len(ID)-1])
+		parts := strings.Split(ID, ".")
+		dbName := parts[0]
+		if dbName[len(dbName)-1] == ')' {
+			nameN, err := strconv.Atoi(dbName[len(dbName)-2 : len(dbName)-1])
 			if err != nil {
 				return 0, err
 			}
 			newNameN := strconv.Itoa(nameN + 1)
-			name = ID[:len(ID)-2] + newNameN + ")"
+			name = dbName[:len(dbName)-2] + newNameN + ")"
 		} else {
-			name = name + " (1)"
+			name = dbName + " (1)"
 		}
 	}
+	name = name + dbExt
 	var tabID int
 	err = db.QueryRow("INSERT INTO tabs (author, name, category, size) VALUES ($1, $2, $3, $4) returning id",
 		musicianID, name, categoryID, size).Scan(&tabID)

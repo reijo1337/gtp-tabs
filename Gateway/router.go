@@ -44,6 +44,10 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 		c.Status(http.StatusOK)
 	})
 	authorized.GET("/profile/:id", ch.getProfile)
+	authorized.POST("/rating", ch.updateRating)
+	authorized.OPTIONS("/rating", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
 
 	r.GET("/alph/:code", ch.getAuthorsByLetter)
 	r.GET("/musicians/:search", ch.getAuthorsByName)

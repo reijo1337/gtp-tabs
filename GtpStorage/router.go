@@ -240,7 +240,7 @@ func (s *service) Upload(c *gin.Context) {
 		)
 		return
 	}
-	tabID, err := s.db.createSong(mus.ID, cat.ID, req.Song, fi.Size())
+	tabID, err := s.db.createSong(mus.ID, cat.ID, req.Filename, fi.Size())
 	if err != nil {
 		log.Println("Can't save info about file", err)
 		c.JSON(
@@ -251,12 +251,27 @@ func (s *service) Upload(c *gin.Context) {
 		)
 		return
 	}
-	tab := &tabInfo{
-		ID:     tabID,
-		Author: mus,
-		Name:   req.Song,
-		Cat:    cat,
-		Size:   fi.Size(),
+	tab, err := s.db.tabByID(tabID)
+	if err != nil {
+		log.Println("Can't get tab by id", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't save info about file",
+			},
+		)
+		return
+	}
+	os.Rename(req.Filename, tab.Name)
+	if err != nil {
+		log.Println("Can't rename file", err)
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "Can't save info about file",
+			},
+		)
+		return
 	}
 	c.JSON(http.StatusOK, tab)
 }
