@@ -135,6 +135,7 @@ func (s *service) GetAuthorsByName(c *gin.Context) {
 		)
 		return
 	}
+	log.Println(result)
 	c.JSON(http.StatusOK, result)
 }
 

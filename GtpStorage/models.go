@@ -2,7 +2,7 @@ package main
 
 // MusiciansWithCount пресдтавление инфорамии об авторах и количеству табулатур
 type MusiciansWithCount struct {
-	ID    int32  `json:"id"`
+	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Count int32  `json:"count"`
 }

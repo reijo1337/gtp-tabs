@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {parse_json} from "../../tools";
+import MusicianWithCount from "./MusicianWithCount";
 import {ListGroup, ListGroupItem} from "react-bootstrap";
-import TabWithSize from "./TabWithSize";
 
-class CategorySearch extends Component{
+class MusiciansSearch extends Component{
     constructor(props) {
         super(props);
-        this.name = this.props.match.params.id;
-        this.url = "http://localhost:9090/musician/"+this.name;
+        this.name = this.props.match.params.name;
+        this.url = "http://localhost:9090/musicians/"+this.name;
         this.state = {
             isLoaded: false,
         };
@@ -45,22 +45,20 @@ class CategorySearch extends Component{
         if (this.state.isLoaded) {
             const resList = this.data.map(ar =>
                 <ListGroupItem key={ar.id}>
-                    <TabWithSize data={ar}/>
+                    <MusicianWithCount data={ar}/>
                 </ListGroupItem>
             );
-            body = <div>
-                    <h1>{this.data.musician}</h1>
-                    <ListGroup>
-                        {resList}
-                    </ListGroup>
-                </div>
+            body = <ListGroup>
+                {resList}
+            </ListGroup>
         }
         return (
             <div>
+                <h1>Результаты по {this.name}</h1>
                 {body}
             </div>
         );
     }
 }
 
-export default CategorySearch;
+export default MusiciansSearch;

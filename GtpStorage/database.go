@@ -137,16 +137,15 @@ func (db *Database) getMusiciansWithCount(rows *sql.Rows) ([]MusiciansWithCount,
 		}
 		result = append(result, resMusician)
 	}
-
-	var count int32
+	newRes := make([]MusiciansWithCount, 0)
 	for _, musician := range result {
-		err := db.QueryRow("SELECT count(*) FROM tabs WHERE author = $1", musician.ID).Scan(&count)
+		err := db.QueryRow("SELECT count(*) FROM tabs WHERE author = $1", musician.ID).Scan(&musician.Count)
 		if err != nil {
 			return nil, err
 		}
-		musician.Count = count
+		newRes = append(newRes, musician)
 	}
-	return result, nil
+	return newRes, nil
 }
 
 func (db *Database) getMusicians(searchString string) ([]MusiciansWithCount, error) {
