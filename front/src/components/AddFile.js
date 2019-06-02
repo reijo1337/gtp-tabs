@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Alert, Button, Col, Form, FormGroup, FormLabel, Row} from "react-bootstrap";
 import jwtDecode from "jwt-decode";
-import {parse_json, updater} from "../tools";
+import {parse_json} from "../tools";
 
 const ROUTES = [
     { name: "Новинки" },
@@ -54,16 +54,38 @@ class AddFile extends Component {
                 authorized: true,
             };
         }
-        //
-        // this.state = {
-        //     validated: false,
-        //     file: "",
-        //     category: ROUTES[0].name,
-        //     musician: "",
-        //     filename: "",
-        //     name: "",
-        // };
     }
+
+    sendFile = async (data) => {
+        const accessToken = localStorage.getItem("accessToken");
+        let response = await fetch(this.url + "?access_token=" + accessToken, {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: data
+        })
+            .then(res => {
+                if (res.status === 200) {
+                    return parse_json(res);
+                } else {
+                    return res.json();
+                }
+            })
+            .then(json => {
+                if (json.error) {
+                    throw new Error(json.error);
+                }
+                alert("ok");
+                return json;
+            })
+            .catch(error => {
+                alert("Проблемы с доступом в джойказино: " + error.message);
+                return error;
+            });
+        return response;
+    };
 
     handleSubmit(event) {
         const form = event.currentTarget;
@@ -86,34 +108,7 @@ class AddFile extends Component {
             category: this.state.category,
             content: this.state.file,
         });
-        const accessToken = localStorage.getItem("accessToken");
-        fetch(this.url + "?access_token="+accessToken, {
-            method: "post",
-            mode: 'no-cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: data
-        })
-            .then( res => {
-                debugger;
-                if (res.status === 200) {
-                    return parse_json(res);
-                } else {
-                    return res.json();
-                }
-            })
-            .then(json => {
-                debugger;
-                if (json.error) {
-                    throw new Error(json.error);
-                }
-                alert("OK!");
-            })
-            .catch((error) => {
-                alert("Проблемы с доступом в джойказино: " + error.message);
-            });
+        this.sendFile(data);
     }
 
     handleFileSelect = evt => {
@@ -158,7 +153,7 @@ class AddFile extends Component {
             body = <Form
                 noValidate
                 validated={validated}
-                onSubmit={e => this.handleSubmit(e)}
+                // onSubmit={e => this.handleSubmit(e)}
             >
                 <FormLabel>
                     <h3>Загрузка файла</h3>
@@ -235,7 +230,8 @@ class AddFile extends Component {
                 <Button
                     block
                     bsSize="large"
-                    type="submit"
+                    onClick={e => this.handleSubmit(e)}
+                    // type="submit"
                 >
                     Добавить
                 </Button>
