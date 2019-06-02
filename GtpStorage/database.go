@@ -32,6 +32,10 @@ func SetUpDatabase() (*Database, error) {
 		return nil, err
 	}
 
+	if err := populate(db); err != nil {
+		return nil, fmt.Errorf("populating db: %v", err)
+	}
+
 	ddb := &Database{DB: db}
 
 	return ddb, nil
@@ -68,6 +72,42 @@ func createSchema(db *sql.DB) error {
 	}
 
 	return nil
+}
+
+func populate(db *sql.DB) error {
+	cats := []string{
+		"Новинки",
+		"Популярные",
+		"Из фильмов и игр",
+		"Местные исполнители",
+		"Школы игры",
+	}
+	var roleID int32
+	for _, cat := range cats {
+		if err := db.QueryRow("SELECT id FROM categories WHERE name = $1", cat).Scan(&roleID); err != nil {
+			if _, err := db.Exec("insert into categories (name) values ($1)", cat); err != nil {
+				return fmt.Errorf("can't insert category: %v", err)
+			}
+		}
+	}
+	return nil
+}
+
+func (db *Database) getTabsByMusicianID(musicianID int) ([]TabWithSize, error) {
+	ret := make([]TabWithSize, 0)
+	rows, err := db.Query("SELECT id, name, size FROM tabs WHERE author = $1", musicianID)
+	if err != nil {
+		return nil, fmt.Errorf("getting tabs: %v", err)
+	}
+	for rows.Next() {
+		var tabInfo TabWithSize
+		_ = rows.Scan(&tabInfo.ID, &tabInfo.Name, &tabInfo.Size)
+		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", musicianID).Scan(&(tabInfo.Musician)); err != nil {
+			return nil, fmt.Errorf("getting musicians: %v", err)
+		}
+		ret = append(ret, tabInfo)
+	}
+	return ret, nil
 }
 
 func (db *Database) getMusiciansByLetter(searchString string) ([]MusiciansWithCount, error) {
@@ -121,14 +161,14 @@ func (db *Database) getMusicians(searchString string) ([]MusiciansWithCount, err
 func (db *Database) getTabsByName(searchString string) ([]TabWithSize, error) {
 	ret := make([]TabWithSize, 0)
 	lowerSearchString := strings.ToLower(searchString)
-	rows, err := db.Query("SELECT author, name, size FROM tabs WHERE (lower(name) LIKE '%" + lowerSearchString + "%')")
+	rows, err := db.Query("SELECT id, author, name, size FROM tabs WHERE (lower(name) LIKE '%" + lowerSearchString + "%')")
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		var tabInfo TabWithSize
 		var musicianID int32
-		_ = rows.Scan(&musicianID, &tabInfo.Name, &tabInfo.Size)
+		_ = rows.Scan(&tabInfo.ID, &musicianID, &tabInfo.Name, &tabInfo.Size)
 		if err := db.QueryRow("SELECT name FROM musicians WHERE id=$1", musicianID).Scan(&(tabInfo.Musician)); err != nil {
 			return nil, err
 		}

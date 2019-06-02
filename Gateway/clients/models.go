@@ -14,6 +14,7 @@ type MusiciansWithCount struct {
 
 // TabWithSize представление информации о табулатуре с ее размером
 type TabWithSize struct {
+	ID       int     `json:"id"`
 	Musician string  `json:"musician"`
 	Name     string  `json:"name"`
 	Size     float64 `json:"size"`

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gtp-tabs/Gateway/clients"
@@ -59,6 +60,31 @@ func (ch *clientHolder) getTabsByName(c *gin.Context) {
 		return
 	}
 	result, err := ch.storage.FindTabsByName(search)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+func (ch *clientHolder) getTabsByMusicianID(c *gin.Context) {
+	search, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("getting id: %v", err)
+		c.JSON(
+			http.StatusBadRequest,
+			gin.H{
+				"error": "invalid id",
+			},
+		)
+		return
+	}
+	result, err := ch.storage.FindTabsByMusicianID(search)
 	if err != nil {
 		c.JSON(
 			http.StatusBadRequest,

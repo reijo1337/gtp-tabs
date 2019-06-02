@@ -35,10 +35,27 @@ func SetUpRouter() (*gin.Engine, error) {
 	r.GET("/musicians/:search", s.GetAuthorsByName)
 	r.GET("/tabs/:search", s.FindTabsByName)
 	r.GET("/category/:name", s.GetAuthorsByCategory)
+	r.GET("/musician/:id", s.getTabsByMusicianID)
 	r.GET("/tab/:id", s.getTabByID)
 	r.POST("/file", s.Upload)
 	r.GET("/file", s.Download)
 	return r, nil
+}
+
+func (s *service) getTabsByMusicianID(c *gin.Context) {
+	musicianID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("getting tab id: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "incorrect id"})
+		return
+	}
+	tabs, err := s.db.getTabsByMusicianID(musicianID)
+	if err != nil {
+		log.Printf("getting tabs by musician id: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't get tabs"})
+		return
+	}
+	c.JSON(http.StatusOK, tabs)
 }
 
 func (s *service) getTabByID(c *gin.Context) {

@@ -16,7 +16,7 @@ class Categories extends Component {
                 <Nav className="justify-content-center">
                     {ROUTES.map((rout, index) => (
                         <Nav.Item key={rout.name}>
-                            <Nav.Link key={rout.name} eventKey={index}>{rout.name}</Nav.Link>
+                            <Nav.Link key={rout.name} eventKey={index} href={"/category/"+rout.name}>{rout.name}</Nav.Link>
                         </Nav.Item>
                     ))}
                 </Nav>
