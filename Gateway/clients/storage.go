@@ -173,10 +173,10 @@ func (sc *StorageClient) UploadFile(upload *FileUploadRequest) (*TabInfo, error)
 		}
 		return nil, fmt.Errorf("error upload response: %v", err)
 	}
-	var ret *TabInfo
+	ret := &TabInfo{}
 	err = json.Unmarshal(body, ret)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting response: %v", err)
 	}
 	return ret, nil
 }

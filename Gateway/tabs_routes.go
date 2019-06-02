@@ -96,10 +96,10 @@ func (ch *clientHolder) getMusiciansByGategory(c *gin.Context) {
 }
 
 func (ch *clientHolder) uploadFile(c *gin.Context) {
-	var upload *clients.FileUploadRequest
+	upload := &clients.FileUploadRequest{}
 	if err := c.BindJSON(upload); err != nil {
 		log.Printf("binding request body: %v", err)
-		c.Status(http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "can't get request"})
 		return
 	}
 	tab, err := ch.storage.UploadFile(upload)

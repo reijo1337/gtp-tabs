@@ -42,9 +42,9 @@ services:
     build: ./Gateway
     restart: always
     environment:
-      URL_STORAGE: "storage"
+      URL_STORAGE: "http://storage:9093"
       URL_AUTH: "auth:9091"
-      URL_POST: "post"
+      URL_POST: "http://post:9094"
       URL_PROFILE: "profile:9095"
       PUBLIC_KEY_LOC: "/etc/keys/public.pem"
       PORT: ":9090"

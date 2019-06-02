@@ -20,7 +20,7 @@ class SearchString extends Component{
                     <InputGroup.Append>
                         <Button variant="outline-secondary">Найти</Button>
                     </InputGroup.Append>
-                    <Button variant="outline-success">Добавить табулатуру</Button>
+                    <Button variant="outline-success" href="/upload">Добавить табулатуру</Button>
                 </InputGroup>
             </Navbar>
         );

@@ -36,7 +36,7 @@ func SetUpRouter() (*gin.Engine, error) {
 	r.GET("/tabs/:search", s.FindTabsByName)
 	r.GET("/category/:name", s.GetAuthorsByCategory)
 	r.GET("/tab/:id", s.getTabByID)
-	r.PUT("/file", s.Upload)
+	r.POST("/file", s.Upload)
 	r.GET("/file", s.Download)
 	return r, nil
 }
