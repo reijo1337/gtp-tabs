@@ -3,6 +3,7 @@ import {parse_json} from "../../tools";
 import {Alert, ListGroup, ListGroupItem} from "react-bootstrap";
 import Rating from "./Rating";
 import Comment from "./Comment";
+import AddComment from "./AddComment";
 
 class Post extends Component{
     constructor(props){
@@ -39,8 +40,9 @@ class Post extends Component{
                     Размер: {this.size} байт
                 </p>
                 <p>
-                    Скачать: <a href={this.download} target="_blank">{this.filename}</a>
+                    Скачать: <a href={this.download} target="_blank" rel="noopener noreferrer">{this.filename}</a>
                 </p>
+                <AddComment postID={this.profile_id}/>
                 <p>Комментарии:</p>
                 <ListGroup>
                     {arrearsList}

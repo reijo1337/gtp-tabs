@@ -69,7 +69,7 @@ func (ch *clientHolder) register(c *gin.Context) {
 	}
 	profile := &clients.ProfileInfo{
 		AccountID:  res.User.ID,
-		Name:       "",
+		Name:       res.User.Login,
 		Registered: time.Now(),
 	}
 	if err := ch.profile.SetProfile(profile); err != nil {
@@ -158,6 +158,7 @@ func (ch *clientHolder) login(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+	log.Println(profile)
 	c.JSON(http.StatusOK, clients.LoginResponse{
 		ProfileID: profile.ID,
 		Tokens:    tokens.Tokens})

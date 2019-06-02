@@ -88,6 +88,11 @@ func (s *service) makeComment(c *gin.Context) {
 		return
 	}
 	var com comment
+	if err := c.BindJSON(&com); err != nil {
+		log.Printf("parsing body: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		return
+	}
 	if err := s.db.makeComment(postID, &com); err != nil {
 		log.Printf("making comment: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "can't make comment"})

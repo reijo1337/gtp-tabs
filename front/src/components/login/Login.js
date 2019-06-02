@@ -98,7 +98,7 @@ class Login extends Component {
                 }
                 localStorage.setItem("accessToken", json.tokens.accessToken);
                 localStorage.setItem("refreshToken", json.tokens.refreshToken);
-                localStorage.setItem("profileID", json.tokens.profile_id);
+                localStorage.setItem("profileID", json.profile_id);
                 localStorage.setItem("login", this.state.login);
                 clearInterval(this._tokenUpdater);
                 const token = json.tokens.accessToken;
