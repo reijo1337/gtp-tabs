@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {parse_json} from "../../tools";
-import {Alert} from "react-bootstrap";
+import {Alert, ListGroup, ListGroupItem} from "react-bootstrap";
 import Rating from "./Rating";
-import {Link} from "react-router-dom";
+import Comment from "./Comment";
 
 class Post extends Component{
     constructor(props){
@@ -25,20 +25,26 @@ class Post extends Component{
                 </p>
             </Alert>
         } else {
+            const arrearsList = this.comments.map(ar =>
+                <ListGroupItem key={ar.id}>
+                    <Comment comment={ar}/>
+                </ListGroupItem>
+            );
             body = <div>
                 <h1>{this.musician_name} - {this.song_name}</h1>
                 <p>
                     Рейтинг: <Rating rating={this.rating} post_id={this.post_id}/>
                 </p>
                 <p>
-                    Размер: {this.size}
+                    Размер: {this.size} байт
                 </p>
                 <p>
-                    Скачать:
-                    <a href={this.download} target="_blank">{this.filename}</a>
-
-                    {/*{this.download}*/}
+                    Скачать: <a href={this.download} target="_blank">{this.filename}</a>
                 </p>
+                <p>Комментарии:</p>
+                <ListGroup>
+                    {arrearsList}
+                </ListGroup>
             </div>
         }
         return (
@@ -52,7 +58,6 @@ class Post extends Component{
         if (!this.state.isLoaded) {
             fetch(this.url)
                 .then(res => {
-                    debugger;
                     if (res.status === 200) {
                         return parse_json(res);
                     } else {
@@ -63,7 +68,6 @@ class Post extends Component{
                     if (json.error) {
                         throw new Error(json.error);
                     }
-                    debugger;
                     this.comments = json.post.comments;
 
                     this.song_name = json.post.song_name;
@@ -82,7 +86,6 @@ class Post extends Component{
 
                 })
                 .catch((error) => {
-                    alert("Cant get arrears: " + error.message);
                 });
         }
     }

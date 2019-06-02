@@ -184,6 +184,7 @@ class AddFile extends Component {
                                     className="custom-file-input"
                                     id="inputGroupFile01"
                                     aria-describedby="inputGroupFileAddon01"
+                                    accept=".gp3,.gp4,.gp5,.gpx"
                                     onChange={this.handleFileSelect}
                                 />
                                 <label id="fileUploadName" className="custom-file-label" htmlFor="inputGroupFile01">
