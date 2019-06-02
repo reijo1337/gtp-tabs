@@ -8,6 +8,7 @@ import CategorySearch from "./components/search/CategorySearch";
 import MusicianSearch from "./components/search/MusicianSearch";
 import MusiciansSearch from "./components/search/MusiciansSearch";
 import TabsSearch from "./components/search/TabsSearch";
+import CheckVkCode from "./components/login/CheckVkCode";
 
 class App extends Component {
   render(){
@@ -22,6 +23,7 @@ class App extends Component {
           <Route path="/musician/:id" component={MusicianSearch}/>
           <Route path="/musicians/:name" component={MusiciansSearch}/>
           <Route path="/tabs/:name" component={TabsSearch}/>
+          <Route path="/vk" component={CheckVkCode}/>
       </div>
     </div>
   );

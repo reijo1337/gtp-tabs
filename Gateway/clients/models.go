@@ -46,8 +46,8 @@ type User struct {
 
 type VkUser struct {
 	ID     int
-	UserID int64 `json:"user_id"`
-	Role   Role  `json:"role"`
+	UserID int  `json:"user_id"`
+	Role   Role `json:"role"`
 }
 
 type Tokens struct {

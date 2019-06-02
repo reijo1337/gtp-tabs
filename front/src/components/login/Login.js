@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Button, Form, FormControl, FormGroup, Modal} from "react-bootstrap";
 import {parse_json, updater} from "../../tools";
 import jwtDecode from "jwt-decode";
+import VkAuth from "./VkAuth";
 
 class Login extends Component {
     constructor(props) {
@@ -52,6 +53,7 @@ class Login extends Component {
                         >
                             Авторизоваться
                         </Button>
+                        <VkAuth/>
                     </form>
                 </Modal.Body>
             </Modal>
@@ -76,7 +78,6 @@ class Login extends Component {
             login: login,
             password: password,
         });
-        debugger;
         fetch(this.url, {
             method: "post",
             headers: {
