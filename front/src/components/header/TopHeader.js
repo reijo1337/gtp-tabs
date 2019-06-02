@@ -74,7 +74,7 @@ class TopHeader extends Component {
                 <Navbar bg="dark" variant="dark">
                     <Navbar.Brand href="/">Огромное хранилище табулатур</Navbar.Brand>
                     <Nav className="mr-auto">
-                        <Nav.Link href="/feedback">Обратная связь</Nav.Link>
+                        {/*<Nav.Link href="/feedback">Обратная связь</Nav.Link>*/}
                     </Nav>
                     <Form inline>
                         {topButtons}

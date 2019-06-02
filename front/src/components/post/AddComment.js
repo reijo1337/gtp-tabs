@@ -30,7 +30,11 @@ class AddComment extends Component {
             author_id: parseInt(profileID),
             content: this.state.text,
         });
-        fetch(url, {
+        this.sendData(data, url);
+    };
+
+    sendData = async (data, url) => {
+        let response = await fetch(url, {
             method: "post",
             headers: {
                 'Accept': 'application/json',
@@ -49,13 +53,14 @@ class AddComment extends Component {
                 if (json.error) {
                     throw new Error(json.error);
                 }
-                alert("ok");
                 window.location.href = "http://127.0.0.1:3000/post/" + json.tab.id;
                 return json;
             })
             .catch(error => {
+                alert("Проблемы с доступом в джойказино: " + error.message);
                 return error;
             });
+        return response;
     };
 
     render() {

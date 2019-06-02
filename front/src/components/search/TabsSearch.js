@@ -1,20 +1,20 @@
 import React, {Component} from 'react';
 import {parse_json} from "../../tools";
-import {Badge} from "react-bootstrap";
+import TabWithSize from "./TabWithSize";
+import {ListGroup, ListGroupItem} from "react-bootstrap";
 
-class Comment extends Component {
+class TabsSearch extends Component{
     constructor(props) {
         super(props);
-        const {comment} = this.props;
-        this.comment = comment;
-        this.url = "http://127.0.0.1:9090/profile/"+this.comment.author_id;
+        this.name = this.props.match.params.name;
+        this.url = "http://localhost:9090/tabs/"+this.name;
         this.state = {
             isLoaded: false,
         };
-        this.loadInfo();
+        this.loadCategory();
     }
 
-    loadInfo = () => {
+    loadCategory = () => {
         if (!this.state.isLoaded) {
             fetch(this.url)
                 .then(res => {
@@ -28,7 +28,7 @@ class Comment extends Component {
                     if (json.error) {
                         throw new Error(json.error);
                     }
-                    this.author_name = json.name;
+                    this.data = json;
 
                     this.setState({
                         isLoaded: true,
@@ -43,21 +43,24 @@ class Comment extends Component {
     render() {
         let body = "";
         if (this.state.isLoaded) {
+            const resList = this.data.map(ar =>
+                <ListGroupItem key={ar.id}>
+                    <TabWithSize data={ar}/>
+                </ListGroupItem>
+            );
             body = <div>
-                <Badge pill variant="dark">
-                    {this.author_name}
-                </Badge>
-                <p>
-                    {this.comment.content}
-                </p>
+                <h1>{this.data.musician}</h1>
+                <ListGroup>
+                    {resList}
+                </ListGroup>
             </div>
         }
-        return(
-            <div className="container">
+        return (
+            <div>
                 {body}
             </div>
         );
     }
 }
 
-export default Comment;
+export default TabsSearch;

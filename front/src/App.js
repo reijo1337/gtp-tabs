@@ -7,6 +7,7 @@ import Post from "./components/post/Post";
 import CategorySearch from "./components/search/CategorySearch";
 import MusicianSearch from "./components/search/MusicianSearch";
 import MusiciansSearch from "./components/search/MusiciansSearch";
+import TabsSearch from "./components/search/TabsSearch";
 
 class App extends Component {
   render(){
@@ -20,6 +21,7 @@ class App extends Component {
           <Route path="/category/:name" component={CategorySearch}/>
           <Route path="/musician/:id" component={MusicianSearch}/>
           <Route path="/musicians/:name" component={MusiciansSearch}/>
+          <Route path="/tabs/:name" component={TabsSearch}/>
       </div>
     </div>
   );

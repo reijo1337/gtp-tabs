@@ -29,11 +29,12 @@ func (a *auth) verifyToken() gin.HandlerFunc {
 		tokenString := c.Query("access_token")
 		if tokenString == "" {
 			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
+				http.StatusOK,
 				gin.H{
 					"error": "Unauthorized",
 				},
 			)
+			return
 		}
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
@@ -43,12 +44,23 @@ func (a *auth) verifyToken() gin.HandlerFunc {
 			return a.publicKey, nil
 		})
 
+		if token == nil {
+			log.Println("Gateway: Authorization failed: ", err.Error())
+			c.AbortWithStatusJSON(
+				http.StatusOK,
+				gin.H{
+					"error": "Unauthorized",
+				},
+			)
+			return
+		}
+
 		if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Next()
 		} else {
 			log.Println("Gateway: Authorization failed: ", err.Error())
 			c.AbortWithStatusJSON(
-				http.StatusUnauthorized,
+				http.StatusOK,
 				gin.H{
 					"error": "Unauthorized",
 				},
