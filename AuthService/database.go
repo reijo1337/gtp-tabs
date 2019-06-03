@@ -46,6 +46,11 @@ func SetUpDatabase() (*Database, error) {
 
 func createSchema(db *sql.DB) error {
 	if _, err := db.Exec(`
+		CREATE SEQUENCE IF NOT EXISTS all_users_id_seq;
+		`); err != nil {
+		return err
+	}
+	if _, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS roles (
 			id SERIAL NOT NULL PRIMARY KEY,
 			name VARCHAR(20) UNIQUE NOT NULL
@@ -54,7 +59,7 @@ func createSchema(db *sql.DB) error {
 	}
 	if _, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
-			id SERIAL NOT NULL PRIMARY KEY,
+			id INT DEFAULT nextval('all_users_id_seq') NOT NULL,
 			login VARCHAR(20) UNIQUE NOT NULL,
 			passhash VARCHAR(70) NOT NULL,
 			role INT NOT NULL
@@ -63,7 +68,7 @@ func createSchema(db *sql.DB) error {
 	}
 	if _, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS vk_users (
-			id SERIAL NOT NULL PRIMARY KEY,
+			id INT DEFAULT nextval('all_users_id_seq') NOT NULL,
 			vk_id BIGINT NOT NULL,
 			role INT NOT NULL
 		)`); err != nil {
