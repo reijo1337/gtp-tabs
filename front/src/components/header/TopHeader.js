@@ -3,10 +3,12 @@ import {Button, Form, Nav, Navbar} from "react-bootstrap";
 import Register from "../login/Register";
 import Login from "../login/Login";
 import jwtDecode from "jwt-decode"
+import VkAuth from "../login/VkAuth";
 
 class TopHeader extends Component {
     constructor(...args) {
         super(...args);
+        debugger;
         const token = localStorage.getItem("accessToken");
         if (token === null || token === "") {
             this.state = {
@@ -67,6 +69,7 @@ class TopHeader extends Component {
                     variant="outline-info"
                     onClick={() => this.setState({registerShow: true})}
                 >Регистрация</Button>
+                <VkAuth/>
             </div>;
         }
         return (

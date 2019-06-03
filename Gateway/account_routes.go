@@ -214,7 +214,7 @@ func (ch *clientHolder) authUser(c *gin.Context) {
 
 	q := req.URL.Query()
 	q.Add("client_id", "6978271")
-	q.Add("client_secret", "foo & bar")
+	q.Add("client_secret", "DKdWDto5gJU4ViGrJW4d")
 	q.Add("redirect_uri", "http://localhost:3000/vk")
 	q.Add("code", code)
 
@@ -250,7 +250,21 @@ func (ch *clientHolder) authUser(c *gin.Context) {
 			log.Println("register: ", err)
 			return
 		}
-		c.JSON(http.StatusOK, res)
+		profile := &clients.ProfileInfo{
+			AccountID:  res.User.ID,
+			Name:       "VK" + strconv.Itoa(res.User.ID),
+			Registered: time.Now(),
+		}
+		if err := ch.profile.SetProfile(profile); err != nil {
+			log.Printf("making profile: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "can't make profile"})
+			return
+		}
+		res.Profile = *profile
+		log.Println(*res)
+		c.JSON(http.StatusOK, clients.LoginResponse{
+			ProfileID: res.Profile.ID,
+			Tokens:    res.Tokens})
 		return
 	}
 	profile, err := ch.profile.GetProfileByAcc(vkAu.UserID)

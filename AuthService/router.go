@@ -192,6 +192,7 @@ func (s *service) refreshToken(c *gin.Context) {
 }
 
 func (s *service) genToken(login string) (*tokens, error) {
+	log.Println(login)
 	AccessTokenExp := time.Now().Add(s.accessExpiration).Unix()
 	RefreshTokenExp := time.Now().Add(s.refreshExpiration).Unix()
 	accesToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
@@ -212,7 +213,6 @@ func (s *service) genToken(login string) (*tokens, error) {
 		return nil, err
 	}
 	refreshTokenString, err := refreshToken.SignedString(s.privateKey)
-
 	return &tokens{
 		AccessToken:  accessTokenString,
 		RefreshToken: refreshTokenString,
@@ -319,8 +319,8 @@ func (s *service) registerVk(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		gin.H{
-			"user":  *newUser,
-			"token": token,
+			"user":   *newUser,
+			"tokens": *token,
 		},
 	)
 }

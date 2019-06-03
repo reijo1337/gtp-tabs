@@ -83,10 +83,7 @@ func setUpRouter(publicKey []byte) (*gin.Engine, error) {
 	r.OPTIONS("/auth", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
-	r.POST("/auth/vk", ch.login)
-	r.OPTIONS("/auth/vk", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
+	r.GET("/auth/vk", ch.authUser)
 	r.GET("/auth", ch.refresh)
 
 	return r, nil

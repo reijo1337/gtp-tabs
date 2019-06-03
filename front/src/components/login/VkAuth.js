@@ -23,8 +23,7 @@ class VkAuth extends Component {
     render() {
         return (
             <Button
-                block
-                bsSize="large"
+                variant="outline-info"
                 href={this.url}
             >
                 Авторизация через VK

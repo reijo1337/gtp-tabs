@@ -7,6 +7,7 @@ RUN go build -mod=vendor -o ./application ./*.go
 FROM alpine:3.7
 WORKDIR /Gateway
 COPY --from=stage Gateway/application application
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 ENV PORT ":9090"
 EXPOSE 9090
 ENTRYPOINT [ "/Gateway/application" ]
