@@ -6,7 +6,7 @@ import jwtDecode from "jwt-decode";
 class Register extends Component {
     constructor(props) {
         super(props);
-        this.url = "http://localhost:9090/register/";
+        this.url = "http://127.0.0.1:9090/register/";
         this.state = {
             login: "",
             password: "",

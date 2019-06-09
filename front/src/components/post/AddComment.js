@@ -53,11 +53,11 @@ class AddComment extends Component {
                 if (json.error) {
                     throw new Error(json.error);
                 }
-                window.location.href = "http://127.0.0.1:3000/post/" + json.tab.id;
+                window.location.href = "http://localhost:3000/post/" + json.tab.id;
                 return json;
             })
             .catch(error => {
-                alert("Проблемы с доступом в джойказино: " + error.message);
+                alert("ок");
                 return error;
             });
         return response;

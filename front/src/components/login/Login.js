@@ -6,7 +6,7 @@ import jwtDecode from "jwt-decode";
 class Login extends Component {
     constructor(props) {
         super(props);
-        this.url = "http://localhost:9090/auth";
+        this.url = "http://127.0.0.1:9090/auth";
         this.state = {
             login: "",
             password: "",

@@ -12,7 +12,7 @@ class CheckVkCode extends Component {
             this.url = "http://127.0.0.1:9090/auth/vk?code=" + myParam;
             this.getAccess();
         } else {
-            window.location = "http://localhost:3000";
+            window.location = "http://127.0.0.1:3000";
         }
     }
 
